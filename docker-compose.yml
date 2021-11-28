@@ -15,6 +15,10 @@ services:
   redis:
     container_name: redis
     image: redis:6.2-alpine
+    restart: unless-stopped
+    volumes:
+      - redis:/data
+    privileged: true
 
   celery_worker_01:
     container_name: celery_worker_01
@@ -76,3 +80,9 @@ services:
     image: redislabs/redisinsight:latest
     ports:
       - 8001:8001
+    volumes:
+      - redisinsight:/db
+
+volumes:
+  redis: null
+  redisinsight: null

@@ -1,0 +1,78 @@
+version: "3.8"
+
+services:
+
+  app:
+    container_name: app
+    build: .
+    command: bash -c "uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
+    volumes:
+      - .:/app
+    ports:
+      - 8000:8000
+    restart: always
+
+  redis:
+    container_name: redis
+    image: redis:6.2-alpine
+
+  celery_worker_01:
+    container_name: celery_worker_01
+    build: .
+    command: celery -A celery_worker.celery worker --loglevel=info
+    volumes:
+      - .:/app
+    environment:
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL}
+      - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND}
+    depends_on:
+      - app
+      - redis
+
+  # celery_worker_02:
+  #   container_name: celery_worker_02
+  #   build: .
+  #   command: celery -A celery_worker.celery worker --loglevel=info
+  #   volumes:
+  #     - .:/app
+  #   environment:
+  #     - CELERY_BROKER_URL=${CELERY_BROKER_URL}
+  #     - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND}
+  #   depends_on:
+  #     - app
+  #     - redis
+
+  # celery_worker_03:
+  #   container_name: celery_worker_03
+  #   build: .
+  #   command: celery -A celery_worker.celery worker --loglevel=info
+  #   volumes:
+  #     - .:/app
+  #   environment:
+  #     - CELERY_BROKER_URL=${CELERY_BROKER_URL}
+  #     - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND}
+  #   depends_on:
+  #     - app
+  #     - redis
+
+  flower:
+    container_name: flower
+    build: .
+    command: celery -A celery_worker.celery flower --port=5555
+    ports:
+      - 5556:5555
+    environment:
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL}
+      - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND}
+    depends_on:
+      - app
+      - redis
+      - celery_worker_01
+      # - celery_worker_02
+      # - celery_worker_03
+
+  redisinsight:
+    container_name: redisinsight
+    image: redislabs/redisinsight:latest
+    ports:
+      - 8001:8001

@@ -1,5 +1,6 @@
 https://www.youtube.com/watch?v=mcX_4EvYka4
 https://github.com/veryacademy/YT_FastAPI_Celery_Redis_Flower_Introduction
+https://github.com/socketio/socket.io-redis-emitter
 
 docker-compose build
 docker-compose up
@@ -24,58 +25,30 @@ curl -X POST http://localhost:8000/ -H "Content-Type: application/json" --data '
 curl -X POST http://localhost:8000/ -H "Content-Type: application/json" --data '{"name":"test", "url": "https://api.neuracash.com/transactions", "http_method": "GET", "body": {"epay_invoice_uuid": "DFSF12", "transtype": "img_kih_newbusiness"}}'
 
 
-SELECT * FROM PAYMENTS -  1000000000000ms
-SELECT * FROM PAYMENTS WHERE ID=1 -  1ms
-SMALL TRANSACTION IS HEALTHIER
+REQUEST: POST
+    name: "img_kih_newbusiness"
+    url: "https://api.imgcorp.com/img_kih_newbusiness/epayph/invoices/ipn/insert"
+    http_method: POST
+    headers: {application/json}
+    body: {"epay_invoice_uuid": "DFSF12", "transtype": "img_kih_newbusiness"}
+    webhook: https://api.imgcorp.com/taskqueue/webhook        
 
-TASKGROUP - INSERT ALL STEPS
-    REQUEST 1-1000
+RESPONSE
+    {task_id: 123}
 
-TASKGROUP - INSERT STEP 1 BY 1
+WEBHOOK:
+    status: success
+    task_id: 123
+    retval: {
+        transid: 232
+        transdadt: 2021-12-12
+    }
+    args: {
+        name: "img_kih_newbusiness"
+        url: "https://api.imgcorp.com/img_kih_newbusiness/epayph/invoices/ipn/insert"
+        http_method: POST
+        headers: {application/json}
+        body: {"epay_invoice_uuid": "DFSF12", "transtype": "img_kih_newbusiness"}
+        webhook: https://api.imgcorp.com/taskqueue/webhook        
+    }
 
-    REQUEST01
-        url: "https://api.imgcorp.net/img_kih_newbusiness/epayph/invoices/ipn/insert"
-        taskgroup: "img_kih_newbusiness"
-        on_success_endpoint: "https://api.imgcorp.net/img_kih_newbusiness/img/payments/payments_master/insert"
-        data: "{
-            transdate: "2021-12-12"
-        }"
-    ON_FAILURE:
-        call function to update TRANSGROUP TABLE OF CURRENT STEP,ENDPOINT,DATA,COMPLETED
-    ON_SUCCESS:
-        call function to update TRANSGROUP TABLE OF CURRENT STEP,ENDPOINT,DATA,COMPLETED        
-        RESPONSE
-            taskgroup: "img_kih_newbusiness"
-            on_success_endpoint: "https://api.imgcorp.net/img_kih_newbusiness/img/payments/payments_master/insert"
-            request: "{
-                transdate: "2021-12-12"
-            }"
-            response: "{
-                transid: 123
-                transdate: "2021-12-12"
-            }"
-
-    REQUEST02
-        url: "https://api.imgcorp.net/img_kih_newbusiness/img/payments/payments_master/insert"
-        taskgroup: "img_kih_newbusiness"
-        transdate: "2021-12-12"
-        on_success_endpoint: "https://api.imgcorp.net/img_kih_newbusiness/img/payments/payments_details/insert"
-        data: "{}"
-    RESPONSE02
-        url: "https://api.imgcorp.net/img_kih_newbusiness/img/payments/payments_master/insert"
-        taskgroup: "img_kih_newbusiness"
-        transdate: "2021-12-12"
-        on_success_endpoint: "https://api.imgcorp.net/img_kih_newbusiness/img/payments/payments_details/insert"
-        request_data: "{}"
-        response_data: "{transid: 123}"
-
-
-
-
-RESPONSE:  CELERY_ID, response_date:{"transid": 131231, "transdate":"2021-01-01"}
-
-REQUEST02:  STEP02 - data {transid: 131231}
-
-
-
-curl "NEW PAYMENT EPAYPH_UUID: JDFKJD" body: {trantype: img_kih_newbusiness} POST

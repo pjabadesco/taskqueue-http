@@ -55,15 +55,15 @@ class BaseWebhookTask(celery.Task):
 def create_task(self, url, http_method, body, headers, webhook_url):
     # try:
         if http_method == "GET":
-            response = requests.get(url, headers=headers)
+            response = requests.get(url, headers=headers, allow_redirects=True)
         elif http_method == "POST":
-            response = requests.post(url, data=body, headers=headers)
+            response = requests.post(url, data=body, headers=headers, allow_redirects=True)
         elif http_method == "PUT":
-            response = requests.put(url, data=body, headers=headers)
+            response = requests.put(url, data=body, headers=headers, allow_redirects=True)
         elif http_method == "PATCH":
-            response = requests.patch(url, data=body, headers=headers)
+            response = requests.patch(url, data=body, headers=headers, allow_redirects=True)
         elif http_method == "DELETE":
-            response = requests.delete(url, headers=headers)
+            response = requests.delete(url, headers=headers, allow_redirects=True)
         else:
             raise RequestException("HTTP Method not supported")
 

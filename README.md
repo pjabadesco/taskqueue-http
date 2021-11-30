@@ -47,7 +47,7 @@ uvicorn main:app --host 0.0.0.0 --port 8001
 }
 ```
 
-## callback RESPONSE: POST
+## CALLBACK RESPONSE: POST
 ```json
 {
     "status": "success",

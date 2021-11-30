@@ -2,6 +2,7 @@ from fastapi import Body, FastAPI
 from fastapi.responses import JSONResponse
 import uvicorn
 import json
+from pprint import pprint
 
 from celery_worker import create_task
 
@@ -16,28 +17,33 @@ def index():
 def index_post(data=Body(...)):
     http_method = data.get("http_method", "GET")
     url = data.get("url", "")
-    body = data.get("body", "{}")
+    body = data.get("body", {})
     headers = data.get("headers", '{"Content-Type": "application/json"}')
     expires = data.get("expires", 86400)
     name = data.get("name", "celery_worker_queue")
+    webhook_url = data.get("webhook_url", "")
 
     if len(url) == 0:
         return JSONResponse({"message": "URL is required"}, status_code=500)
     if not url.startswith("http://") and not url.startswith("https://"):
         return JSONResponse({"message": "URL must start with http:// or https://"}, status_code=500)
 
+    if len(webhook_url) > 0:
+        if not webhook_url.startswith("http://") and not webhook_url.startswith("https://"):
+            return JSONResponse({"message": "Webhook URL must start with http:// or https://"}, status_code=500)
+
     if http_method not in ["GET", "POST", "PUT", "PATCH", "DELETE"]:
         return JSONResponse({"message": "HTTP Method must be GET, POST, PUT, PATCH, or DELETE"}, status_code=500)
 
     if len(body) > 0:
         try:
-            json.loads(body)
+            json.dumps(body)
         except:
             return JSONResponse({"message": "Body must be in JSON format"}, status_code=500)
 
     if len(headers) > 0:
         try:
-            headers = json.loads(headers)
+            json.dumps(headers)
         except:
             return JSONResponse({"message": "Headers must be in JSON format"}, status_code=500)
 
@@ -52,7 +58,7 @@ def index_post(data=Body(...)):
         # create task
         task = create_task.apply_async(
             shadow_name=name,
-            args=(url, http_method, body, headers),
+            args=(url, http_method, body, headers, webhook_url),
             # max_retries=5,
             # expires=expires
         )

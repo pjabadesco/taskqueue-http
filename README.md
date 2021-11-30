@@ -79,6 +79,11 @@ uvicorn main:app --host 0.0.0.0 --port 8001
 }
 ```
 
+## TEST
+```sh
+cd test
+php -S 0.0.0.0:8888
+```
 
 ## CURL REQUESTS EXAMPLES
 ```bash
@@ -86,7 +91,7 @@ curl --location --request POST 'http://localhost:8000' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "name": "new_post",
-    "url": "https://yahoo.com",
+    "url": "http://192.168.100.130:8888/index.php",
     "http_method": "POST",
     "headers": {
         "Content-Type": "application/json"
@@ -95,6 +100,6 @@ curl --location --request POST 'http://localhost:8000' \
         "invoice_uuid": "TEST123", 
         "transtype": "new_post"
     },
-    "callback_url": "https://yahoo.com"
+    "callback_url": "http://192.168.100.130:8888/callback.php"
 }'
 ```

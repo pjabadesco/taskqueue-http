@@ -24,11 +24,13 @@ class CallbackTask(celery.Task):
         if len(callback_url) > 0:
             if callback_url.startswith("http://") or callback_url.startswith("https://"):
                 try:
-                    requests.post(args[4], data={
+                    requests.post(args[4], data=json.dumps({
                         "status": "success",
                         "task_id": task_id,
                         "args": json.dumps(args),
                         "retval": json.dumps(retval),
+                    }), headers={
+                        "Content-Type": "application/json",
                     })
                 except RequestException as e:
                     print(e)
@@ -42,11 +44,13 @@ class CallbackTask(celery.Task):
         if len(callback_url) > 0:
             if callback_url.startswith("http://") or callback_url.startswith("https://"):
                 try:
-                    requests.post(args[4], data={
-                        "status": "success",
+                    requests.post(args[4], data=json.dumps({
+                        "status": "failed",
                         "task_id": task_id,
                         "args": json.dumps(args),
                         "einfo": str(einfo),
+                    }), headers={
+                        "Content-Type": "application/json",
                     })
                 except RequestException as e:
                     print(e)
@@ -75,6 +79,11 @@ def create_task(self, url, http_method, body, headers, callback_url):
         if not response.ok:
             raise RequestException(f'{url} returned unexpected response code: {response.status_code}')
 
+        try:
+            response_body = response.json()
+        except ValueError:
+            response_body = response.text
+
         return {
             "url": url, 
             "http_method": http_method, 
@@ -82,7 +91,7 @@ def create_task(self, url, http_method, body, headers, callback_url):
             "body": body, 
             "response_code": response.status_code, 
             # "response_headers": response_headers, 
-            "response_body": response.text
+            "response_body": response_body
         }
         # return response.json()
         # return str(response)

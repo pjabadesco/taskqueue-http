@@ -43,7 +43,8 @@ uvicorn main:app --host 0.0.0.0 --port 8001
 ## RESPONSE:
 ```json
 {
-    "task_id": 123
+    "message": "Task created successfully",
+    "task_id": "06b650d4-8d21-4b20-ac8b-be62fc656997"
 }
 ```
 
@@ -51,7 +52,7 @@ uvicorn main:app --host 0.0.0.0 --port 8001
 ```json
 {
     "status": "success",
-    "task_id": 123,
+    "task_id": "06b650d4-8d21-4b20-ac8b-be62fc656997",
     "retval": {
         "transid": 232,
         "transdate": "2021-12-12"

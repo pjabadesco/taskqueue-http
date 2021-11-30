@@ -85,7 +85,7 @@ cd test
 php -S 0.0.0.0:8888
 ```
 
-## CURL REQUESTS EXAMPLES
+## CURL REQUESTS TEST
 ```bash
 curl --location --request POST 'http://localhost:8000' \
 --header 'Content-Type: application/json' \

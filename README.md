@@ -77,7 +77,6 @@ uvicorn main:app --host 0.0.0.0 --port 8001
 ```bash
 curl --location --request POST 'http://localhost:8000' \
 --header 'Content-Type: application/json' \
---header 'Cookie: PHPSESSID=7c8533b21cf55ae3602e048bf7433b12' \
 --data-raw '{
     "name": "new_post",
     "url": "https://yahoo.com",

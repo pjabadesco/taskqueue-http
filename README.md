@@ -1,3 +1,9 @@
+## TECHNOLOGY
+- Redis
+- Celery
+- Celery Worker
+- Flower
+
 ## LINKS
 - https://github.com/pjabadesco/taskqueue-http
 - https://www.youtube.com/watch?v=mcX_4EvYka4

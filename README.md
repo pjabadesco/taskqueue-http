@@ -1,4 +1,5 @@
 ## LINKS
+- https://github.com/pjabadesco/taskqueue-http
 - https://www.youtube.com/watch?v=mcX_4EvYka4
 - https://github.com/veryacademy/YT_FastAPI_Celery_Redis_Flower_Introduction
 - https://github.com/socketio/socket.io-redis-emitter
@@ -25,15 +26,15 @@ uvicorn main:app --host 0.0.0.0 --port 8001
 ## REQUEST: POST
 ```json
 {
-    "name": "img_kih_newbusiness",
-    "url": "https://api.imgcorp.com/img_kih_newbusiness/epayph/invoices/ipn/insert",
+    "name": "new_post",
+    "url": "https://example.com/post/insert",
     "http_method": "POST",
     "headers": ["Content-Type: application/json"],
     "body": {
-        "epay_invoice_uuid": "DFSF12", 
+        "nvoice_uuid": "DFSF12", 
         "transtype": "img_kih_newbusiness"
     },
-    "webhook_url": "https://api.imgcorp.com/taskqueue/webhook"
+    "webhook_url": "https://example.com/taskqueue/webhook"
 }
 ```
 
@@ -54,15 +55,15 @@ uvicorn main:app --host 0.0.0.0 --port 8001
         "transdate": "2021-12-12"
     },
     "args": {
-        "name": "img_kih_newbusiness",
-        "url": "https://api.imgcorp.com/img_kih_newbusiness/epayph/invoices/ipn/insert",
+        "name": "new_post",
+        "url": "https://example.com/post/insert",
         "http_method": "POST",
         "headers": ["Content-Type: application/json"],
         "body": {
-            "epay_invoice_uuid": "DFSF12", 
+            "nvoice_uuid": "DFSF12", 
             "transtype": "img_kih_newbusiness"
         },
-        "webhook_url": "https://api.imgcorp.com/taskqueue/webhook"
+        "webhook_url": "https://example.com/taskqueue/webhook"
     }
 }
 ```
@@ -74,7 +75,7 @@ curl --location --request POST 'http://localhost:8000' \
 --header 'Content-Type: application/json' \
 --header 'Cookie: PHPSESSID=7c8533b21cf55ae3602e048bf7433b12' \
 --data-raw '{
-    "name": "img_kih_newbusiness",
+    "name": "new_post",
     "url": "https://yahoo.com",
     "http_method": "POST",
     "headers": {
@@ -82,7 +83,7 @@ curl --location --request POST 'http://localhost:8000' \
     },
     "body": {
         "epay_invoice_uuid": "DFSF12", 
-        "transtype": "img_kih_newbusiness"
+        "transtype": "new_post"
     },
     "webhook_url": "https://yahoo.com"
 }'

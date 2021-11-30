@@ -32,7 +32,7 @@ uvicorn main:app --host 0.0.0.0 --port 8001
     "headers": ["Content-Type: application/json"],
     "body": {
         "nvoice_uuid": "DFSF12", 
-        "transtype": "img_kih_newbusiness"
+        "transtype": "new_post"
     },
     "webhook_url": "https://example.com/taskqueue/webhook"
 }
@@ -61,7 +61,7 @@ uvicorn main:app --host 0.0.0.0 --port 8001
         "headers": ["Content-Type: application/json"],
         "body": {
             "nvoice_uuid": "DFSF12", 
-            "transtype": "img_kih_newbusiness"
+            "transtype": "new_post"
         },
         "webhook_url": "https://example.com/taskqueue/webhook"
     }

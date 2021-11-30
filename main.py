@@ -21,16 +21,16 @@ def index_post(data=Body(...)):
     headers = data.get("headers", '{"Content-Type": "application/json"}')
     expires = data.get("expires", 86400)
     name = data.get("name", "celery_worker_queue")
-    webhook_url = data.get("webhook_url", "")
+    callback_url = data.get("callback_url", "")
 
     if len(url) == 0:
         return JSONResponse({"message": "URL is required"}, status_code=500)
     if not url.startswith("http://") and not url.startswith("https://"):
         return JSONResponse({"message": "URL must start with http:// or https://"}, status_code=500)
 
-    if len(webhook_url) > 0:
-        if not webhook_url.startswith("http://") and not webhook_url.startswith("https://"):
-            return JSONResponse({"message": "Webhook URL must start with http:// or https://"}, status_code=500)
+    if len(callback_url) > 0:
+        if not callback_url.startswith("http://") and not callback_url.startswith("https://"):
+            return JSONResponse({"message": "callback URL must start with http:// or https://"}, status_code=500)
 
     if http_method not in ["GET", "POST", "PUT", "PATCH", "DELETE"]:
         return JSONResponse({"message": "HTTP Method must be GET, POST, PUT, PATCH, or DELETE"}, status_code=500)
@@ -58,7 +58,7 @@ def index_post(data=Body(...)):
         # create task
         task = create_task.apply_async(
             shadow_name=name,
-            args=(url, http_method, body, headers, webhook_url),
+            args=(url, http_method, body, headers, callback_url),
             # max_retries=5,
             # expires=expires
         )

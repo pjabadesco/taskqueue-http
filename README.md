@@ -36,7 +36,7 @@ uvicorn main:app --host 0.0.0.0 --port 8001
         "nvoice_uuid": "DFSF12", 
         "transtype": "new_post"
     },
-    "webhook_url": "https://example.com/taskqueue/webhook"
+    "callback_url": "https://example.com/taskqueue/callback"
 }
 ```
 
@@ -47,7 +47,7 @@ uvicorn main:app --host 0.0.0.0 --port 8001
 }
 ```
 
-## WEBHOOK RESPONSE: POST
+## callback RESPONSE: POST
 ```json
 {
     "status": "success",
@@ -67,7 +67,7 @@ uvicorn main:app --host 0.0.0.0 --port 8001
             "nvoice_uuid": "DFSF12", 
             "transtype": "new_post"
         },
-        "webhook_url": "https://example.com/taskqueue/webhook"
+        "callback_url": "https://example.com/taskqueue/callback"
     }
 }
 ```
@@ -88,6 +88,6 @@ curl --location --request POST 'http://localhost:8000' \
         "epay_invoice_uuid": "DFSF12", 
         "transtype": "new_post"
     },
-    "webhook_url": "https://yahoo.com"
+    "callback_url": "https://yahoo.com"
 }'
 ```

@@ -1,0 +1,52 @@
+version: "3.8"
+services:
+
+  app:
+    container_name: app
+    image: pjabadesco/taskqueue-http-app:latest
+    command: bash -c "uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
+    volumes:
+      - app:/app
+    ports:
+      - 8888:8000
+    restart: always
+
+  redis:
+    container_name: redis
+    image: redis:6.2-alpine
+    restart: unless-stopped
+    volumes:
+      - redis:/data
+    privileged: true
+
+  celery_worker:
+    container_name: celery_worker
+    image: pjabadesco/taskqueue-http-celery-worker:latest
+    command: celery -A celery_worker.celery worker --loglevel=info
+    volumes:
+      - celery_worker:/app
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - app
+      - redis
+
+  flower:
+    container_name: flower
+    image: pjabadesco/taskqueue-http-flower:latest
+    command: celery -A celery_worker.celery flower --port=5555
+    ports:
+      - 5556:5555
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - app
+      - redis
+      - celery_worker
+
+volumes:
+  app: null
+  redis: null
+  celery_worker: null

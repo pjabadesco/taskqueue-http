@@ -9,7 +9,7 @@ services:
     volumes:
       - .:/app
     ports:
-      - 8000:8000
+      - 8888:8000
     restart: always
 
   redis:
@@ -20,8 +20,8 @@ services:
       - redis:/data
     privileged: true
 
-  celery_worker_01:
-    container_name: celery_worker_01
+  celery_worker:
+    container_name: celery_worker
     build: .
     command: celery -A celery_worker.celery worker --loglevel=info
     volumes:
@@ -71,17 +71,17 @@ services:
     depends_on:
       - app
       - redis
-      - celery_worker_01
+      - celery_worker
       # - celery_worker_02
       # - celery_worker_03
 
-  redisinsight:
-    container_name: redisinsight
-    image: redislabs/redisinsight:latest
-    ports:
-      - 8001:8001
-    volumes:
-      - redisinsight:/db
+      # redisinsight:
+      #   container_name: redisinsight
+      #   image: redislabs/redisinsight:latest
+      #   ports:
+      #     - 8001:8001
+      #   volumes:
+      #     - redisinsight:/db
 
 volumes:
   redis: null

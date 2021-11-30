@@ -12,9 +12,6 @@
 
 ## COMMANDS
 ```sh
-docker-compose build
-docker-compose up
-
 conda env list
 conda create --name taskqueue-http python=3.9
 conda activate taskqueue-http
@@ -27,6 +24,9 @@ pip3 install orjson
 pip3 freeze > requirements.txt
 python3 ./app.py
 uvicorn main:app --host 0.0.0.0 --port 8001
+
+docker-compose build
+docker-compose up
 ```
 
 ## REQUEST: POST
@@ -82,16 +82,16 @@ uvicorn main:app --host 0.0.0.0 --port 8001
 ## TEST: CALLBACK SERVER
 ```sh
 cd test
-php -S 0.0.0.0:8888
+php -S 0.0.0.0:8887
 ```
 
 ## TEST: CURL REQUESTS
 ```bash
-curl --location --request POST 'http://localhost:8000' \
+curl --location --request POST 'http://localhost:8888' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "name": "new_post",
-    "url": "http://192.168.100.130:8888/index.php",
+    "url": "http://192.168.100.130:8887/index.php",
     "http_method": "POST",
     "headers": {
         "Content-Type": "application/json"
@@ -100,6 +100,23 @@ curl --location --request POST 'http://localhost:8000' \
         "invoice_uuid": "TEST123", 
         "transtype": "new_post"
     },
-    "callback_url": "http://192.168.100.130:8888/callback.php"
+    "callback_url": "http://192.168.100.130:8887/callback.php"
+}'
+```
+```bash
+curl --location --request POST 'http://192.168.100.5:8888' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "name": "new_post",
+    "url": "http://192.168.100.130:8887/index.php",
+    "http_method": "POST",
+    "headers": {
+        "Content-Type": "application/json"
+    },
+    "body": {
+        "invoice_uuid": "TEST123", 
+        "transtype": "new_post"
+    },
+    "callback_url": "http://192.168.100.130:8887/callback.php"
 }'
 ```

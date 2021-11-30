@@ -33,7 +33,7 @@ uvicorn main:app --host 0.0.0.0 --port 8001
         "Content-Type: application/json"
     },
     "body": {
-        "nvoice_uuid": "DFSF12", 
+        "nvoice_uuid": "TEST123", 
         "transtype": "new_post"
     },
     "callback_url": "https://example.com/taskqueue/callback"
@@ -64,7 +64,7 @@ uvicorn main:app --host 0.0.0.0 --port 8001
             "Content-Type: application/json"
         },
         "body": {
-            "nvoice_uuid": "DFSF12", 
+            "nvoice_uuid": "TEST123", 
             "transtype": "new_post"
         },
         "callback_url": "https://example.com/taskqueue/callback"
@@ -85,7 +85,7 @@ curl --location --request POST 'http://localhost:8000' \
         "Content-Type": "application/json"
     },
     "body": {
-        "epay_invoice_uuid": "DFSF12", 
+        "epay_invoice_uuid": "TEST123", 
         "transtype": "new_post"
     },
     "callback_url": "https://yahoo.com"

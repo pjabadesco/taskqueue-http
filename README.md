@@ -29,7 +29,9 @@ uvicorn main:app --host 0.0.0.0 --port 8001
     "name": "new_post",
     "url": "https://example.com/post/insert",
     "http_method": "POST",
-    "headers": ["Content-Type: application/json"],
+    "headers": {
+        "Content-Type: application/json"
+    },
     "body": {
         "nvoice_uuid": "DFSF12", 
         "transtype": "new_post"
@@ -58,7 +60,9 @@ uvicorn main:app --host 0.0.0.0 --port 8001
         "name": "new_post",
         "url": "https://example.com/post/insert",
         "http_method": "POST",
-        "headers": ["Content-Type: application/json"],
+        "headers": {
+            "Content-Type: application/json"
+        },
         "body": {
             "nvoice_uuid": "DFSF12", 
             "transtype": "new_post"

@@ -1,5 +1,6 @@
 from fastapi import Body, FastAPI
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 import json
 from pprint import pprint
@@ -8,6 +9,13 @@ from celery_worker import create_task
 
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 def index():

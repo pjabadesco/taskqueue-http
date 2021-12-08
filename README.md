@@ -5,6 +5,17 @@
 - Flower
 
 ## LINKS
+API Page
+- http://localhost/
+Flower
+- http://localhost:5556/
+Redis Manager
+- http://localhost:8001/
+WebSocket Server
+- http://localhost:3000
+TaskQueue Page
+- http://localhost:8888
+
 - https://github.com/pjabadesco/taskqueue-http
 - https://www.youtube.com/watch?v=mcX_4EvYka4
 - https://github.com/veryacademy/YT_FastAPI_Celery_Redis_Flower_Introduction
@@ -77,12 +88,6 @@ docker-compose up
         "callback_url": "https://example.com/taskqueue/callback"
     }
 }
-```
-
-## TEST: CALLBACK SERVER
-```sh
-cd test
-php -S 0.0.0.0:8887
 ```
 
 ## TEST: CURL REQUESTS

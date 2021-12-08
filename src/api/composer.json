@@ -1,0 +1,12 @@
+{
+    "name": "pjabadesco/test",
+    "authors": [
+        {
+            "name": "Paolo Josef J. Abadesco",
+            "email": "pjabadesco@gmail.com"
+        }
+    ],
+    "require": {
+        "ashiina/socket.io-emitter": "^0.8.0"
+    }
+}

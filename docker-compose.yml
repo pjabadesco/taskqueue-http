@@ -12,16 +12,38 @@ services:
       - 8888:8000
     restart: always
 
+  api:
+    container_name: api
+    image: pjabadesco/php74-apache-mssql-mysql:1.1
+    volumes:
+      - ./src/api:/var/www/html/
+    ports:
+      - 80:80
+
+  ws:
+    container_name: ws
+    image: node:lts-alpine
+    working_dir: /home/node/app
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ./src/ws:/home/node/app/
+    ports:
+      - 3000:3000
+    command: "npm start"
+
   redis:
     container_name: redis
     image: redis:6.2-alpine
     restart: unless-stopped
     volumes:
       - redis:/data
+    ports:
+      - 6379:6379
     privileged: true
 
-  celery_worker:
-    container_name: celery_worker
+  celery_worker_01:
+    container_name: celery_worker_01
     build: .
     command: celery -A celery_worker.celery worker --loglevel=info
     volumes:
@@ -71,17 +93,17 @@ services:
     depends_on:
       - app
       - redis
-      - celery_worker
+      - celery_worker_01
       # - celery_worker_02
       # - celery_worker_03
 
-      # redisinsight:
-      #   container_name: redisinsight
-      #   image: redislabs/redisinsight:latest
-      #   ports:
-      #     - 8001:8001
-      #   volumes:
-      #     - redisinsight:/db
+  redisinsight:
+    container_name: redisinsight
+    image: redislabs/redisinsight:latest
+    ports:
+      - 8001:8001
+    volumes:
+      - redisinsight:/db
 
 volumes:
   redis: null

@@ -14,16 +14,16 @@ $(document).ready(function() {
             },
             data: JSON.stringify({
                 "name": "new_post",
-                "url": "http://localhost/api.php?action=login",
+                "url": "http://api/api.php?action=login",
                 "http_method": "POST",
                 "headers": {
                     "Content-Type": "application/json"
                 },
                 "body": {
-                    "invoice_uuid": "TEST123", 
-                    "transtype": "new_post"
+                    "login": login,
+                    "password": password
                 },
-                "callback_url": "http://localhost:8887/callback.php"                
+                "callback_url": "http://api/api.php?action=login_callback"
             }),
             success: function (data) {
                 if (data && data.task_id) {
@@ -52,7 +52,7 @@ function taskqueue(task_id) {
         content.append('<br>'+message);
     }) ;
     
-    socket.on('pubsub', function (message){
+    socket.on('announcement', function (message){
         content.append('<br>'+message);
     }) ;
 
@@ -60,7 +60,11 @@ function taskqueue(task_id) {
         console.log('disconnected');
         content.html("<b>Disconnected!</b>");
     });
-    
+
     socket.connect();
     
+    socket.emit('subscribe', {
+        channel: task_id
+    });
+
 };

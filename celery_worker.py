@@ -58,14 +58,16 @@ class CallbackTask(celery.Task):
 @celery.task(name="create_task", base=CallbackTask, bind=True, autoretry_for=(RequestException,), retry_backoff=True)
 def create_task(self, url, http_method, body, headers, callback_url):
     # try:
+        headers.update({'X-TASK-ID': self.request.id})
+
         if http_method == "GET":
             response = requests.get(url, headers=headers, allow_redirects=True)
         elif http_method == "POST":
-            response = requests.post(url, data=body, headers=headers, allow_redirects=True)
+            response = requests.post(url, json=body, headers=headers, allow_redirects=True)
         elif http_method == "PUT":
-            response = requests.put(url, data=body, headers=headers, allow_redirects=True)
+            response = requests.put(url, json=body, headers=headers, allow_redirects=True)
         elif http_method == "PATCH":
-            response = requests.patch(url, data=body, headers=headers, allow_redirects=True)
+            response = requests.patch(url, json=body, headers=headers, allow_redirects=True)
         elif http_method == "DELETE":
             response = requests.delete(url, headers=headers, allow_redirects=True)
         else:

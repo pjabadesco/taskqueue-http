@@ -1,39 +1,41 @@
 const { createServer } = require("http");
-const { Server } = require("socket.io");
-const { createAdapter } = require("@socket.io/redis-adapter");
-const { createClient } = require("redis");
+const {Server } = require("socket.io");
+const Redis = require("ioredis");
+const redis = new Redis(6379, "redis");
 
 const httpServer = createServer((req, res) => {
-  res.writeHead(200, { 'Content-Type': 'text/plain' });
-  res.end('okay');
+    res.writeHead(200, {
+        'Content-Type': 'text/plain'
+    });
+    res.end('okay');
 });
 const io = new Server(httpServer, {
-  cors: {
-    origin: "*",
-    methods: ["GET", "POST"]
-  }
-});        
-
-const pubClient = createClient({ host: "redis", port: 6379 });
-const subClient = pubClient.duplicate();
-
-io.emit('hello', 'to all clients');
-
-io.on("connection", (socket) => {
-    // setInterval(function () {
-    //     socket.emit('pubsub', 'Hello World!');
-    // }, 3000);    
-
-    io.on("joinRoom", (key) => {
-        socket.join(key);
-    });    
-
-    io.on("message", (key) => {
-        socket.join(key);
-    });    
-
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"]
+    }
 });
 
+io.on("connection", (socket) => {
+  
+    socket.on("subscribe", (message) => {
+        socket.emit('announcement', message.channel);
 
-io.adapter(createAdapter(pubClient, subClient));
-httpServer.listen(3000);   
+        redis.subscribe('announcement', message.channel, (err, count) => {
+            if (err) {
+              console.error("\n############\nFAILED TO SUBSCRIBE: %s\n############\n", err.message);
+            } else {
+              console.log(`\n############\nSUBSCRIBED SUCCESSFULLY! THIS CLIENT IS CURRENTLY SUBSCRIBED TO ${count} CHANNELS. ${message.channel}\n############\n`);
+            }
+        });        
+    });
+
+    redis.on("message", (channel, message) => {
+        console.log(`\n############\nRECEIVED ${message} FROM ${channel}\n############\n`);
+        socket.emit(channel, message);
+    });  
+    
+  
+  });
+
+httpServer.listen(3000);

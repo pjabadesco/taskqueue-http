@@ -9,7 +9,7 @@ API Page
 - http://localhost/
 Flower
 - http://localhost:5556/
-Redis Manager
+Redis Insight
 - http://localhost:8001/
 WebSocket Server
 - http://localhost:3000
@@ -95,33 +95,16 @@ docker-compose up
 curl --location --request POST 'http://localhost:8888' \
 --header 'Content-Type: application/json' \
 --data-raw '{
-    "name": "new_post",
-    "url": "http://192.168.100.130:8887/index.php",
+    "name": "login",
+    "url": "http://192.168.100.130/api.php?action=login",
     "http_method": "POST",
     "headers": {
         "Content-Type": "application/json"
     },
     "body": {
-        "invoice_uuid": "TEST123", 
-        "transtype": "new_post"
+        "login": "TEST123", 
+        "password": "new_post"
     },
-    "callback_url": "http://192.168.100.130:8887/callback.php"
-}'
-```
-```bash
-curl --location --request POST 'http://192.168.100.5:8888' \
---header 'Content-Type: application/json' \
---data-raw '{
-    "name": "new_post",
-    "url": "http://192.168.100.130:8887/index.php",
-    "http_method": "POST",
-    "headers": {
-        "Content-Type": "application/json"
-    },
-    "body": {
-        "invoice_uuid": "TEST123", 
-        "transtype": "new_post"
-    },
-    "callback_url": "http://192.168.100.130:8887/callback.php"
+    "callback_url": "http://192.168.100.130/api.php?action=login_callback"
 }'
 ```

@@ -1,20 +1,19 @@
 {
-    "name": "app",
-    "version": "1.0.0",
-    "description": "",
-    "main": "index.js",
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "start": "nodemon index.js"
-    },
-    "keywords": [],
-    "author": "",
-    "license": "ISC",
-    "dependencies": {
-        "@socket.io/redis-adapter": "^7.1.0",
-        "http": "^0.0.1-security",
-        "nodemon": "^2.0.15",
-        "redis": "^4.0.0",
-        "socket.io": "^4.4.0"
-    }
+  "name": "ws",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "http": "^0.0.1-security",
+    "ioredis": "^4.28.2",
+    "nodemon": "^2.0.15",
+    "socket.io": "^4.4.0"
+  }
 }

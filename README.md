@@ -90,4 +90,3 @@ curl --location --request POST 'http://localhost:8888' \
 - https://github.com/pjabadesco/taskqueue-http
 - https://www.youtube.com/watch?v=mcX_4EvYka4
 - https://github.com/veryacademy/YT_FastAPI_Celery_Redis_Flower_Introduction
-- https://github.com/socketio/socket.io-redis-emitter

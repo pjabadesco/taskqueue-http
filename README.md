@@ -5,11 +5,11 @@
 - Flower
 
 ## LINKS
-- [API Page] (http://localhost/)
-- [Flower] (http://localhost:5556/)
-- [Redis Insight] (http://localhost:8001/)
-- [WebSocket Server] (http://localhost:3000)
-- [TaskQueue Page] (http://localhost:8888)
+- [API Page](http://localhost/)
+- [Flower](http://localhost:5556/)
+- [Redis Insight](http://localhost:8001/)
+- [WebSocket Server](http://localhost:3000)
+- [TaskQueue Page](http://localhost:8888)
 
 ## COMMANDS
 ```sh

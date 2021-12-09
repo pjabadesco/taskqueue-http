@@ -5,16 +5,11 @@
 - Flower
 
 ## LINKS
-[API Page] (http://localhost/)
-[Flower] (http://localhost:5556/)
-[Redis Insight] (http://localhost:8001/)
-[WebSocket Server] (http://localhost:3000)
-[TaskQueue Page] (http://localhost:8888)
-
-- https://github.com/pjabadesco/taskqueue-http
-- https://www.youtube.com/watch?v=mcX_4EvYka4
-- https://github.com/veryacademy/YT_FastAPI_Celery_Redis_Flower_Introduction
-- https://github.com/socketio/socket.io-redis-emitter
+- [API Page] (http://localhost/)
+- [Flower] (http://localhost:5556/)
+- [Redis Insight] (http://localhost:8001/)
+- [WebSocket Server] (http://localhost:3000)
+- [TaskQueue Page] (http://localhost:8888)
 
 ## COMMANDS
 ```sh
@@ -103,3 +98,9 @@ curl --location --request POST 'http://localhost:8888' \
     "callback_url": "http://192.168.100.130/api.php?action=login_callback"
 }'
 ```
+
+## REFERENCES
+- https://github.com/pjabadesco/taskqueue-http
+- https://www.youtube.com/watch?v=mcX_4EvYka4
+- https://github.com/veryacademy/YT_FastAPI_Celery_Redis_Flower_Introduction
+- https://github.com/socketio/socket.io-redis-emitter

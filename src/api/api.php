@@ -11,11 +11,11 @@ switch($_REQUEST['action']) {
             $json = file_get_contents('php://input');
             $data = json_decode($json);        
 
-            $message = 'Intializing task: '.$task_id;
+            $payload = 'Intializing task: '.$task_id;
             sleep(1);
-            $redis->publish($task_id, $message);
+            $redis->publish($task_id, $payload);
 
-            if($data->username == 'admin' && $data->password == 'admin') {
+            if($data->login == 'admin' && $data->password == 'admin') {
                 $ret = array(
                     'status' => 'success', 
                     'message' => 'Login successful',
@@ -30,18 +30,18 @@ switch($_REQUEST['action']) {
                     'url_next' => 'http://localhost/api/api.php?action=step2&taskid='.$task_id,
                     'data' => ''            
                 );
-                $message = 'Task: '.$task_id.' completed successfully';
-                $redis->publish($task_id, $message);
+                $payload = 'Task: '.$task_id.' completed successfully';
+                $redis->publish($task_id, $payload);
                 $redis->publish('task-completed', $task_id);
             } else {
-                $message = 'Task: '.$task_id.' failed';
-                $redis->publish($task_id, $message);
+                $payload = 'Task: '.$task_id.' failed';
+                $redis->publish($task_id, $payload);
                 $redis->publish('task-failed', $task_id);
             }
 
             $ret = array(
                 'status' => 'ok',
-                'message' => $message,
+                'message' => $payload,
             );
             error_log('################# LOGIN BEGIN #################');        
             error_log(print_r($data, TRUE));         
@@ -77,9 +77,9 @@ switch($_REQUEST['action']) {
         $data = json_decode($json);
         $task_id = trim($data->task_id);
 
-        $message = 'Status: '.$data->status.' Task: '.$task_id.' completed';
+        $payload = 'Status: '.$data->status.' Task: '.$task_id.' completed';
         usleep(250000);
-        $redis->publish($task_id, $message);
+        $redis->publish($task_id, $payload);
 
         error_log('################# CALLBACK BEGIN #################');        
         error_log(print_r($data, TRUE));         

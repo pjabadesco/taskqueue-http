@@ -34,13 +34,10 @@ switch($taskgroup) {
                             "body" => $response,
                             "callback_url" => "http://api/callback.php?action=login"
                         ));
-                        // $redis->publish($channel_id, json_encode($ret));
-                        // $payload = tq($taskgroup,$response,$data,0,1,$url_next='');
                         $response->status = 'pending';
                         $redis->publish($channel_id, json_encode($response));
                     }else{
                         // if login is INVALID return FAILURE
-                        // tq($message,$data);         
                         $response->status = 'fail';
                         $response->message = 'Sorry wrong credentials.';
                         $redis->publish($channel_id, json_encode($response));
@@ -55,18 +52,6 @@ switch($taskgroup) {
             // LOG FAILED
             // INSERT ALL FAILURES TO MYSQL DB
         };
-
-
-        // $payload = 'Status: '.$data->status.' Task: '.$task_id.' completed';
-        // usleep(250000);
-        // $redis->publish($task_id, $payload);
-
-        // error_log('################# CALLBACK BEGIN #################');        
-        // error_log(print_r($data, TRUE));         
-        // error_log('################# CALLBACK END #################');        
-        // header('Content-Type: application/json; charset=utf-8');
-        // echo json_encode($ret);
-
         break;
     default:
         $data = array(

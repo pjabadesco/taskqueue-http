@@ -38,8 +38,6 @@ switch($taskgroup) {
                         $redis->publish($channel_id, json_encode($response));
                     }else{
                         // if login is INVALID return FAILURE
-                        $response->status = 'fail';
-                        $response->message = 'Sorry wrong credentials.';
                         $redis->publish($channel_id, json_encode($response));
                     };
                     break;

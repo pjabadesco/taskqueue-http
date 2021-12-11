@@ -12,6 +12,11 @@ switch($_REQUEST['action']) {
             $data = json_decode($json);        
 
             if($data->login == 'admin' && $data->password == 'admin') {
+                // SET SESSION
+                session_id($data->session_id);
+                session_start();
+                $_SESSION['login'] = $data->login;
+
                 $ret = array(
                     'status' => 'success',
                     'message' => 'Your credentials are valid. Please wait while we setup your login session.',
@@ -19,7 +24,7 @@ switch($_REQUEST['action']) {
                 );
             } else {
                 $ret = array(
-                    'status' => 'failed',
+                    'status' => 'fail',
                     'message' => 'Login failed',
                     'session_id' => $data->session_id
                 );
@@ -40,13 +45,9 @@ switch($_REQUEST['action']) {
         $json = file_get_contents('php://input');
         $data = json_decode($json);        
 
-        // SET SESSION
-        session_id($data->session_id);
-        session_start();
-        $_SESSION['login'] = 'admin';
         $ret = array(
             'status' => 'success',
-            'message' => 'Session set successfully. SessionID: '.$data->session_id,
+            'message' => 'Login set successfully. Redirecting to Dashboard...',
         );
         header('Content-Type: application/json; charset=utf-8');
         echo json_encode($ret);

@@ -19,16 +19,29 @@ class CallbackTask(celery.Task):
         # task_id (str) - Id of the executed task.
         # args (Tuple) - Original arguments for the task that was executed.
         # kwargs (Dict) - Original keyword arguments for the task that was executed.
-        print('{0!r} success: {1!r}'.format(task_id, retval))
-        callback_url = args[4]
+        print('{0!r} success: {1!r}'.format(task_id, retval))        
+        try:
+            headers = args[4]
+            channel_id = headers['X-CHANNEL-ID']
+        except:
+            channel_id = task_id            
+        callback_url = args[5]
         if len(callback_url) > 0:
             if callback_url.startswith("http://") or callback_url.startswith("https://"):
                 try:
-                    requests.post(args[4], data=json.dumps({
+                    requests.post(args[5], data=json.dumps({
                         "status": "success",
                         "task_id": task_id,
-                        "args": json.dumps(args),
-                        "retval": json.dumps(retval),
+                        "channel_id": channel_id,
+                        "request": {
+                            "taskname": args[0],
+                            "url": args[1], 
+                            "http_method": args[2], 
+                            "body": args[3], 
+                            "headers": args[4], 
+                            "callback_url": args[5]
+                        },
+                        "response": retval,
                     }), headers={
                         "Content-Type": "application/json",
                     })
@@ -40,14 +53,21 @@ class CallbackTask(celery.Task):
         # args (Tuple) - Original arguments for the task that failed.
         # kwargs (Dict) - Original keyword arguments for the task that failed.
         print('{0!r} failed: {1!r}'.format(task_id, exc))
-        callback_url = args[4]
+        callback_url = args[5]
         if len(callback_url) > 0:
             if callback_url.startswith("http://") or callback_url.startswith("https://"):
                 try:
-                    requests.post(args[4], data=json.dumps({
+                    requests.post(args[5], data=json.dumps({
                         "status": "failed",
                         "task_id": task_id,
-                        "args": json.dumps(args),
+                        "args": {
+                            "taskname": args[0],
+                            "url": args[1], 
+                            "http_method": args[2], 
+                            "body": args[3], 
+                            "headers": args[4], 
+                            "callback_url": args[5]
+                        },
                         "einfo": str(einfo),
                     }), headers={
                         "Content-Type": "application/json",
@@ -56,7 +76,7 @@ class CallbackTask(celery.Task):
                     print(e)
 
 @celery.task(name="create_task", base=CallbackTask, bind=True, autoretry_for=(RequestException,), retry_backoff=True)
-def create_task(self, url, http_method, body, headers, callback_url):
+def create_task(self, taskname, url, http_method, body, headers, callback_url):
     # try:
         headers.update({'X-TASK-ID': self.request.id})
 
@@ -87,13 +107,13 @@ def create_task(self, url, http_method, body, headers, callback_url):
             response_body = response.text
 
         return {
-            "url": url, 
-            "http_method": http_method, 
+            # "url": url, 
+            # "http_method": http_method, 
             "headers": headers, 
-            "body": body, 
-            "response_code": response.status_code, 
+            # "body": body, 
+            "status_code": response.status_code, 
             # "response_headers": response_headers, 
-            "response_body": response_body
+            "body": response_body
         }
         # return response.json()
         # return str(response)

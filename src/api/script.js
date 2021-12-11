@@ -1,7 +1,9 @@
 $(document).ready(function() {
     $('#login').focus();
 
-    $('#myForm').on('submit', function(e) {
+    $('#myForm').on('submit', function (e) {
+        $('#btn_submit').hide();
+        $('#btn_submit_loading').show();
         e.preventDefault();
         var login = $('#login').val();
         var password = $('#password').val();
@@ -13,7 +15,7 @@ $(document).ready(function() {
                 "Content-Type":"application/json"
             },
             data: JSON.stringify({
-                "name": "new_post",
+                "taskname": "test-login",
                 "url": "http://api/api.php?action=login",
                 "http_method": "POST",
                 "headers": {
@@ -21,9 +23,10 @@ $(document).ready(function() {
                 },
                 "body": {
                     "login": login,
-                    "password": password
+                    "password": password,
+                    "session_id": $('#session_id').val(),
                 },
-                "callback_url": "http://api/api.php?action=login_callback"
+                "callback_url": "http://api/callback.php?action=login"
             }),
             success: function (data) {
                 if (data && data.task_id) {
@@ -48,8 +51,20 @@ function taskqueue(task_id) {
         content.html("<b>Connected!</b>");
     });
     
-    socket.on(task_id, function (message){
-        content.append('<br>'+message);
+    socket.on(task_id, function (message) {
+        message = JSON.parse(message);
+        content.append('<br>' + message.message);
+        switch (message.status) {
+            case 'pending':
+                break;
+            case 'success':
+                window.location.href = 'dashboard.php';
+                break;
+            case 'fail':
+                $('#btn_submit').show();
+                $('#btn_submit_loading').hide();        
+                break;
+        };
     }) ;
     
     socket.on('announcement', function (message){

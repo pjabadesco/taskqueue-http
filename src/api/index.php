@@ -1,4 +1,7 @@
-<!doctype html>
+<?php
+session_start();
+$session_id = session_id();
+?><!doctype html>
 <html lang="en">
 
 <head>
@@ -36,7 +39,15 @@
             <form id="myForm">
                 <input type="text" id="login" class="fadeIn second" name="login" placeholder="login" required>
                 <input type="text" id="password" class="fadeIn third" name="login" placeholder="password" required>
-                <input type="submit" class="fadeIn fourth" value="Log In">
+                <!-- <input type="submit" class="fadeIn fourth" value="Log In"> -->
+                <div class="d-grid gap-2 col-6 mx-auto mb-3">
+                    <button id="btn_submit" type="submit" class="btn btn-lg btn-primary">Log In</button>
+                    <button id="btn_submit_loading" class="btn btn-lg btn-primary" type="button" disabled style="display:none;">
+                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                        Loading...
+                    </button>     
+                </div>
+                <input type="hidden" id="session_id" value="<?php echo $session_id; ?>">
             </form>
 
             <!-- Remind Passowrd -->

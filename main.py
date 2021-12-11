@@ -28,7 +28,7 @@ def index_post(data=Body(...)):
     body = data.get("body", {})
     headers = data.get("headers", '{"Content-Type": "application/json"}')
     expires = data.get("expires", 86400)
-    name = data.get("name", "celery_worker_queue")
+    taskname = data.get("taskname", "celery_worker_queue")
     callback_url = data.get("callback_url", "")
 
     if len(url) == 0:
@@ -65,8 +65,8 @@ def index_post(data=Body(...)):
     try:
         # create task
         task = create_task.apply_async(
-            shadow_name=name,
-            args=(url, http_method, body, headers, callback_url),
+            shadow=taskname,
+            args=(taskname, url, http_method, body, headers, callback_url),
             # max_retries=5,
             # expires=expires
         )

@@ -20,17 +20,17 @@ docker-compose up
 ## REQUEST: POST
 ```json
 {
-    "name": "new_post",
-    "url": "https://example.com/post/insert",
+    "taskname": "test-login",
+    "url": "http://api/api.php?action=login",
     "http_method": "POST",
     "headers": {
-        "Content-Type: application/json"
+        "Content-Type": "application/json"
     },
     "body": {
-        "invoice_uuid": "TEST123", 
-        "transtype": "new_post"
+        "login": "admin",
+        "password": "admin"
     },
-    "callback_url": "https://example.com/taskqueue/callback"
+    "callback_url": "http://api/callback.php?action=login"
 }
 ```
 
@@ -45,24 +45,34 @@ docker-compose up
 ## CALLBACK RESPONSE: POST
 ```json
 {
-    "status": "success",
-    "task_id": "06b650d4-8d21-4b20-ac8b-be62fc656997",
-    "retval": {
-        "transid": 232,
-        "transdate": "2021-12-12"
+    "status":"success",
+    "task_id":"b0c84268-f687-499d-998d-584985da9df0",
+    "request":{
+        "taskname":"test-login",
+        "url":"http://api/api.php?action=login",
+        "http_method":"POST",
+        "body":{
+            "login":"admin",
+            "password":"admin",
+            "session_id":"5aee3a7be4b4abc9a063b799cf8b8244"
+        },
+        "headers":{
+            "Content-Type":"application/json",
+            "X-TASK-ID":"b0c84268-f687-499d-998d-584985da9df0"
+        },
+        "callback_url":"http://api/callback.php?action=login"
     },
-    "args": {
-        "name": "new_post",
-        "url": "https://example.com/post/insert",
-        "http_method": "POST",
-        "headers": {
-            "Content-Type: application/json"
+    "response":{
+        "headers":{
+            "Content-Type":"application/json",
+            "X-TASK-ID":"b0c84268-f687-499d-998d-584985da9df0"
         },
-        "body": {
-            "invoice_uuid": "TEST123", 
-            "transtype": "new_post"
-        },
-        "callback_url": "https://example.com/taskqueue/callback"
+        "status_code":200,
+        "body":{
+            "status":"success",
+            "message":"Your credentials are valid. Please wait while we setup your login session.",
+            "session_id":"5aee3a7be4b4abc9a063b799cf8b8244"
+        }
     }
 }
 ```
@@ -72,17 +82,18 @@ docker-compose up
 curl --location --request POST 'http://localhost:8888' \
 --header 'Content-Type: application/json' \
 --data-raw '{
-    "name": "login",
-    "url": "http://192.168.100.130/api.php?action=login",
-    "http_method": "POST",
-    "headers": {
-        "Content-Type": "application/json"
+    "taskname":"test-login",
+    "url":"http://api/api.php?action=login",
+    "http_method":"POST",
+    "body":{
+        "login":"admin",
+        "password":"admin",
+        "session_id":"5aee3a7be4b4abc9a063b799cf8b8244"
     },
-    "body": {
-        "login": "TEST123", 
-        "password": "new_post"
+    "headers":{
+        "Content-Type":"application/json"
     },
-    "callback_url": "http://192.168.100.130/api.php?action=login_callback"
+    "callback_url":"http://api/callback.php?action=login"
 }'
 ```
 

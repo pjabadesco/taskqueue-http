@@ -45,10 +45,17 @@ switch($_REQUEST['action']) {
         $json = file_get_contents('php://input');
         $data = json_decode($json);        
 
-        $ret = array(
-            'status' => 'success',
-            'message' => 'Login set successfully. Redirecting to Dashboard...',
-        );
+        if($headers['Authorization'] == 'Bearer THISIASASUPERSECRETKEY') {
+            $ret = array(
+                'status' => 'success',
+                'message' => 'Login set successfully. Redirecting to Dashboard...',
+            );
+        } else {
+            $ret = array(
+                'status' => 'fail',
+                'message' => 'Login failed - invalid token',
+            );
+        };
         header('Content-Type: application/json; charset=utf-8');
         echo json_encode($ret);
         break;

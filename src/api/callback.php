@@ -29,7 +29,8 @@ switch($taskgroup) {
                             "http_method" => "POST",
                             "headers" => array(
                                 "Content-Type" => "application/json",
-                                "X-CHANNEL-ID" => $channel_id
+                                "X-CHANNEL-ID" => $channel_id,
+                                "Authorization" => "Bearer 1THISIASASUPERSECRETKEY"
                             ),
                             "body" => $response,
                             "callback_url" => "http://api/callback.php?action=login"
@@ -42,8 +43,11 @@ switch($taskgroup) {
                     };
                     break;
                 case 'test-login01':
-                    $response->status = 'success';
-                    $redis->publish($channel_id,json_encode($response));
+                    if($response->status=='success'){
+                        $redis->publish($channel_id,json_encode($response));
+                    }else{
+                        $redis->publish($channel_id,json_encode($response));    
+                    };
                     break;
             };    
         } else {            

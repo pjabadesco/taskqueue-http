@@ -53,12 +53,15 @@ function taskqueue(task_id) {
     
     socket.on(task_id, function (message) {
         message = JSON.parse(message);
+        console.log(message);
         content.append('<br>' + message.message);
         switch (message.status) {
             case 'pending':
                 break;
             case 'success':
-                window.location.href = 'dashboard.php';
+                setTimeout(function() {
+                    window.location.href = 'dashboard.php';
+                }, 3000)
                 break;
             case 'fail':
                 $('#btn_submit').show();

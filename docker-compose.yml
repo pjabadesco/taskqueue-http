@@ -56,31 +56,31 @@ services:
       - app
       - redis
 
-  # celery_worker_02:
-  #   container_name: celery_worker_02
-  #   build: .
-  #   command: celery -A celery_worker.celery worker --loglevel=info
-  #   volumes:
-  #     - .:/app
-  #   environment:
-  #     - CELERY_BROKER_URL=${CELERY_BROKER_URL}
-  #     - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND}
-  #   depends_on:
-  #     - app
-  #     - redis
+  celery_worker_02:
+    container_name: celery_worker_02
+    build: .
+    command: celery -A celery_worker.celery worker --loglevel=info
+    volumes:
+      - .:/app
+    environment:
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL}
+      - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND}
+    depends_on:
+      - app
+      - redis
 
-  # celery_worker_03:
-  #   container_name: celery_worker_03
-  #   build: .
-  #   command: celery -A celery_worker.celery worker --loglevel=info
-  #   volumes:
-  #     - .:/app
-  #   environment:
-  #     - CELERY_BROKER_URL=${CELERY_BROKER_URL}
-  #     - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND}
-  #   depends_on:
-  #     - app
-  #     - redis
+  celery_worker_03:
+    container_name: celery_worker_03
+    build: .
+    command: celery -A celery_worker.celery worker --loglevel=info
+    volumes:
+      - .:/app
+    environment:
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL}
+      - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND}
+    depends_on:
+      - app
+      - redis
 
   flower:
     container_name: flower
@@ -95,8 +95,8 @@ services:
       - app
       - redis
       - celery_worker_01
-      # - celery_worker_02
-      # - celery_worker_03
+      - celery_worker_02
+      - celery_worker_03
 
   redisinsight:
     container_name: redisinsight
@@ -105,6 +105,30 @@ services:
       - 8001:8001
     volumes:
       - redisinsight:/db
+
+  mysql:
+    container_name: mysql
+    image: mariadb:10.3
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: notSecureChangeMe
+      MYSQL_DATABASE: test
+    ports:
+      - "3306:3306"
+
+  phpmyadmin:
+    container_name: phpmyadmin
+    image: phpmyadmin
+    restart: always
+    ports:
+      - 8082:80
+    environment:
+      - PMA_HOST=mysql
+      - PMA_USER=root
+      - PMA_PASSWORD=notSecureChangeMe
+      - PMA_DATABASE=test
+    depends_on:
+      - mysql
 
 volumes:
   redis: null

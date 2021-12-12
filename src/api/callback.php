@@ -2,6 +2,7 @@
 $redis = new \Redis;
 $redis->connect('redis', 6379);
 
+$tq_url = 'http://app:8000';
 $taskgroup = $_REQUEST['action'];
 
 switch($taskgroup) {
@@ -11,7 +12,7 @@ switch($taskgroup) {
         $response = $data->response->body;
         $request = $data->request->body;
         $channel_id = ($data->channel_id)?$data->channel_id:$data->task_id;        
-
+        
         // $redis->publish($channel_id,json_encode($data));  
         // error_log('################# LOGIN BEGIN #################');        
         // error_log(print_r($data, TRUE));         
@@ -22,8 +23,7 @@ switch($taskgroup) {
                 case 'test-login':
                     if($response->status=='success'){
                         // if login is VALID redirect to SET SESSION at /test-login
-                        $url = 'http://app:8000';
-                        $ret = curlPost($url, array(
+                        $ret = curlPost($tq_url, array(
                             "taskname" => "test-login01",
                             "url" => "http://api/api.php?action=login01",
                             "http_method" => "POST",
@@ -37,16 +37,20 @@ switch($taskgroup) {
                         ));
                         $response->status = 'pending';
                         $redis->publish($channel_id, json_encode($response));
+                        tq_log($taskgroup,$data,1,1,0);
                     }else{
                         // if login is INVALID return FAILURE
                         $redis->publish($channel_id, json_encode($response));
+                        tq_log($taskgroup,$data,1,1,1);
                     };
                     break;
                 case 'test-login01':
                     $redis->publish($channel_id,json_encode($response));
+                    tq_log($taskgroup,$data,1,1,1);
                     break;
             };    
         } else {            
+            tq_log($taskgroup,$data,0,0,0);
             // LOG FAILED
             // INSERT ALL FAILURES TO MYSQL DB
         };
@@ -70,6 +74,8 @@ function curlPost($url, $data) {
     curl_setopt($ch, CURLOPT_POST, 1);
     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+    curl_setopt($ch, CURLOPT_TCP_FASTOPEN, 1);
     $ret = curl_exec($ch);
     curl_close ($ch);
     $ret = json_decode($ret, true);  
@@ -79,22 +85,31 @@ function curlPost($url, $data) {
     return $ret;
 }
 
-function tq($taskgroup,$message,$data,$completed=1,$step=1,$url_next=''){
-    $response = $data->response;
+function tq_log($taskgroup,$data,$success,$step=1,$completed=1){
+    global $tq_url;
+    $response = $data->response->body;
     $request = $data->request;
-    $ret = array(
-        'message' => $message,
-        'transdate' => date('Y-m-d H:i:s'),
-        'channel' => $data->channel,
-        'task_id' => $data->task_id,
-        'taskgroup' => $taskgroup,
-        'taskname' => $request->taskname,
-        'completed' => $completed,
-        'step' => $step,
-        'url' => $request->url,
-        'url_next' => $url_next,
-        'data' => $data
-    );
+
+    curlPost($tq_url, array(
+        "taskname" => 'tq_log',
+        "url" => 'http://api/api.php?action=tq_log',
+        "http_method" => "POST",
+        "headers" => array(
+            "Content-Type" => "application/json",
+            "Authorization" => "Bearer THISIASASUPERSECRETKEY"
+        ),
+        "body" => array(
+            'taskgroup' => $taskgroup,
+            'channel' => $data->channel_id,
+            'task_id' => $data->task_id,
+            'taskname' => $request->taskname,
+            'success' => $success,
+            'step' => $step,
+            'completed' => $completed,
+            'data' => $data
+        )
+    ));
+
     return $ret;
 };
 ?>

@@ -3,6 +3,9 @@
 - Celery
 - Celery Worker
 - Flower
+- MySQL
+- PHP
+- TaskGroups
 
 ## LINKS
 - [API Page] (http://localhost/)

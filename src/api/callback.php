@@ -1,4 +1,19 @@
 <?php
+$json = file_get_contents('php://input');
+$data = json_decode($json);
+$response = $data->response->body;
+$request = $data->request->body;
+$channel_id = ($data->channel_id)?$data->channel_id:$data->task_id;        
+
+if(strlen($channel_id)==0){
+    header("HTTP/1.1 500 Internal Server Error");
+    header('Content-Type: application/json; charset=utf-8');
+    die(json_encode(array(
+        'status' => 'error',
+        'message' => 'not allowed'
+    )));    
+};
+
 $redis = new \Redis;
 $redis->connect('redis', 6379);
 
@@ -7,7 +22,6 @@ $tq_ch = curl_init();
 curl_setopt($tq_ch, CURLOPT_URL,$tq_url);
 
 $taskgroup = $_REQUEST['action'];
-
 switch($taskgroup) {
     case 'login':
         $json = file_get_contents('php://input');

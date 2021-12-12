@@ -22,10 +22,13 @@ switch($taskgroup) {
         error_log('################# LOGIN END #################');        
     
         if($data->status == 'success') {
+            $tq_success = 1;
             switch($data->request->taskname){
                 case 'test-login':
+                    $tq_step = 1;
                     if($response->status=='success'){
                         // if login is VALID redirect to SET SESSION at /test-login
+                        $tq_completed = 0;
                         $ret = tq_post(array(
                             "taskname" => "test-login01",
                             "url" => "http://api/api.php?action=login01",
@@ -39,19 +42,21 @@ switch($taskgroup) {
                             "callback_url" => "http://api/callback.php?action=login"
                         ));
                         $response->status = 'pending';
-                        tq_log($taskgroup,$data,1,1,0);
                     }else{
                         // if login is INVALID return FAILURE
-                        tq_log($taskgroup,$data,1,1,1);
+                        $tq_completed = 1;
                     };
                     break;
                 case 'test-login01':
-                    tq_log($taskgroup,$data,1,1,1);
+                    $tq_step = 2;
+                    $tq_completed = 1;
                     break;
             };    
             $redis->publish($channel_id, json_encode($response));
-        } else {            
-            tq_log($taskgroup,$data,0,0,0);
+        } else {       
+            $tq_success = 0;     
+            $tq_step = 0;
+            $tq_completed = 0;
             // LOG FAILED
             // INSERT ALL FAILURES TO MYSQL DB
         };
@@ -64,7 +69,10 @@ switch($taskgroup) {
         $redis->publish('announcement', 'This is an announcement.');
         header('Content-Type: application/json; charset=utf-8');
         echo json_encode($data);    
+        die();
 }
+
+tq_log($taskgroup,$data,$tq_success,$tq_step,$tq_completed);
 
 curl_close($tq_ch);
 

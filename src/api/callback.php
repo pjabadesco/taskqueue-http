@@ -5,6 +5,9 @@ $redis->connect('redis', 6379);
 $tq_url = 'http://app:8000';
 $taskgroup = $_REQUEST['action'];
 
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_URL,$tq_url);
+
 switch($taskgroup) {
     case 'login':
         $json = file_get_contents('php://input');
@@ -23,7 +26,7 @@ switch($taskgroup) {
                 case 'test-login':
                     if($response->status=='success'){
                         // if login is VALID redirect to SET SESSION at /test-login
-                        $ret = curlPost($tq_url, array(
+                        $ret = tqPost(array(
                             "taskname" => "test-login01",
                             "url" => "http://api/api.php?action=login01",
                             "http_method" => "POST",
@@ -63,9 +66,8 @@ switch($taskgroup) {
         echo json_encode($data);    
 }
 
-function curlPost($url, $data) {
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL,$url);
+function tqPost($data) {
+    global $ch;
     curl_setopt($ch, CURLOPT_HTTPHEADER, array(
         'Content-Type: application/json'
     ));
@@ -77,9 +79,9 @@ function curlPost($url, $data) {
     $ret = curl_exec($ch);
     curl_close ($ch);
     $ret = json_decode($ret, true);  
-    error_log('################# CURLPOST BEGIN #################');        
+    error_log('################# tqPOST BEGIN #################');        
     error_log(print_r($ret, TRUE));         
-    error_log('################# CURLPOST END #################');        
+    error_log('################# tqPOST END #################');        
     return $ret;
 }
 
@@ -88,7 +90,7 @@ function tq_log($taskgroup,$data,$success,$step=1,$completed=1){
     $response = $data->response->body;
     $request = $data->request;
 
-    curlPost($tq_url, array(
+    tqPost(array(
         "taskname" => 'tq_log',
         "url" => 'http://api/api.php?action=tq_log',
         "http_method" => "POST",

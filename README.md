@@ -81,13 +81,33 @@ docker-compose up
 }
 ```
 
-## TEST: CURL REQUESTS
+## TEST: CURL REQUESTS - SUCCESS
 ```bash
 curl --location --request POST 'http://localhost:8888' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "taskname":"test-login",
     "url":"http://api/api.php?action=login",
+    "http_method":"POST",
+    "body":{
+        "login":"admin",
+        "password":"admin",
+        "session_id":"5aee3a7be4b4abc9a063b799cf8b8244"
+    },
+    "headers":{
+        "Content-Type":"application/json"
+    },
+    "callback_url":"http://api/callback.php?action=login"
+}'
+```
+
+## TEST: CURL REQUESTS - FAIL
+```bash
+curl --location --request POST 'http://localhost:8888' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "taskname":"test-login",
+    "url":"http://fail.test",
     "http_method":"POST",
     "body":{
         "login":"admin",

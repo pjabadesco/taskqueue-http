@@ -60,7 +60,7 @@ class CallbackTask(celery.Task):
                     requests.post(args[5], data=json.dumps({
                         "status": "failed",
                         "task_id": task_id,
-                        "args": {
+                        "request": {
                             "taskname": args[0],
                             "url": args[1], 
                             "http_method": args[2], 

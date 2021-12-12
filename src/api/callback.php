@@ -30,7 +30,7 @@ switch($taskgroup) {
                             "headers" => array(
                                 "Content-Type" => "application/json",
                                 "X-CHANNEL-ID" => $channel_id,
-                                "Authorization" => "Bearer 1THISIASASUPERSECRETKEY"
+                                "Authorization" => "Bearer THISIASASUPERSECRETKEY"
                             ),
                             "body" => $response,
                             "callback_url" => "http://api/callback.php?action=login"

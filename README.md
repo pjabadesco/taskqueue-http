@@ -106,7 +106,7 @@ curl --location --request POST 'http://localhost:8888' \
 curl --location --request POST 'http://localhost:8888' \
 --header 'Content-Type: application/json' \
 --data-raw '{
-    "taskname":"test-login",
+    "taskname":"test-fail",
     "url":"http://fail.test",
     "http_method":"POST",
     "body":{

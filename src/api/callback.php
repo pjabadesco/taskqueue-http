@@ -73,7 +73,6 @@ switch($taskgroup) {
 }
 
 tq_log($taskgroup,$data,$tq_success,$tq_step,$tq_completed);
-
 curl_close($tq_ch);
 
 function tq_post($data) {

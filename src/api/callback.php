@@ -17,9 +17,9 @@ switch($taskgroup) {
         $channel_id = ($data->channel_id)?$data->channel_id:$data->task_id;        
         
         // $redis->publish($channel_id,json_encode($data));  
-        // error_log('################# LOGIN BEGIN #################');        
-        // error_log(print_r($data, TRUE));         
-        // error_log('################# LOGIN END #################');        
+        error_log('################# LOGIN BEGIN #################');        
+        error_log(print_r($data, TRUE));         
+        error_log('################# LOGIN END #################');        
     
         if($data->status == 'success') {
             switch($data->request->taskname){

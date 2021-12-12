@@ -26,7 +26,7 @@ switch($taskgroup) {
                 case 'test-login':
                     if($response->status=='success'){
                         // if login is VALID redirect to SET SESSION at /test-login
-                        $ret = tqPost(array(
+                        $ret = tq_post(array(
                             "taskname" => "test-login01",
                             "url" => "http://api/api.php?action=login01",
                             "http_method" => "POST",
@@ -66,7 +66,7 @@ switch($taskgroup) {
         echo json_encode($data);    
 }
 
-function tqPost($data) {
+function tq_post($data) {
     global $ch;
     curl_setopt($ch, CURLOPT_HTTPHEADER, array(
         'Content-Type: application/json'
@@ -79,9 +79,9 @@ function tqPost($data) {
     $ret = curl_exec($ch);
     curl_close ($ch);
     $ret = json_decode($ret, true);  
-    error_log('################# tqPOST BEGIN #################');        
+    error_log('################# TQ_POST BEGIN #################');        
     error_log(print_r($ret, TRUE));         
-    error_log('################# tqPOST END #################');        
+    error_log('################# TQ_POST END #################');        
     return $ret;
 }
 
@@ -90,7 +90,7 @@ function tq_log($taskgroup,$data,$success,$step=1,$completed=1){
     $response = $data->response->body;
     $request = $data->request;
 
-    tqPost(array(
+    tq_post(array(
         "taskname" => 'tq_log',
         "url" => 'http://api/api.php?action=tq_log',
         "http_method" => "POST",

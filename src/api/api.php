@@ -116,6 +116,11 @@ switch($_REQUEST['action']) {
         };
 
         break;
+    case 'logout':
+        session_start();
+        session_destroy();
+        header('Location: dashboard.php');
+        break;
     default:
         $data = array(
             "hello" => "world",

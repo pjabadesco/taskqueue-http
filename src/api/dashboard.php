@@ -1986,7 +1986,7 @@ shadow-saturn-ring{ 0%   { box-shadow: inset -16px  0      4px   rgba(20, 40, 50
     <body class="opening hide-UI view-2D zoom-large data-close controls-close">
         <div id="navbar">
             <a id="toggle-data" href="#data"><i class="icon-data"></i>Data</a>
-            <h1>Welcome <?=$_SESSION['login']?><br><span> <a href="logout.php">LOGOUT</a></span></h1>
+            <h1>Welcome <?=$_SESSION['login']?><br><span> <a href="/api.php?action=logout">LOGOUT</a></span></h1>
             <a id="toggle-controls" href="#controls"><i class="icon-controls"></i>Controls</a>
         </div>
         <div id="data">

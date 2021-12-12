@@ -122,7 +122,7 @@ function tq_log($taskgroup,$data,$success,$step=1,$completed=1){
         ),
         "body" => array(
             'taskgroup' => $taskgroup,
-            'channel' => $data->channel_id,
+            'channel' => ($data->channel_id)?:$data->task_id,
             'task_id' => $data->task_id,
             'taskname' => $request->taskname,
             'success' => $success,

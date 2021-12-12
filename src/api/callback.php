@@ -36,19 +36,17 @@ switch($taskgroup) {
                             "callback_url" => "http://api/callback.php?action=login"
                         ));
                         $response->status = 'pending';
-                        $redis->publish($channel_id, json_encode($response));
                         tq_log($taskgroup,$data,1,1,0);
                     }else{
                         // if login is INVALID return FAILURE
-                        $redis->publish($channel_id, json_encode($response));
                         tq_log($taskgroup,$data,1,1,1);
                     };
                     break;
                 case 'test-login01':
-                    $redis->publish($channel_id,json_encode($response));
                     tq_log($taskgroup,$data,1,1,1);
                     break;
             };    
+            $redis->publish($channel_id, json_encode($response));
         } else {            
             tq_log($taskgroup,$data,0,0,0);
             // LOG FAILED

@@ -43,11 +43,7 @@ switch($taskgroup) {
                     };
                     break;
                 case 'test-login01':
-                    if($response->status=='success'){
-                        $redis->publish($channel_id,json_encode($response));
-                    }else{
-                        $redis->publish($channel_id,json_encode($response));    
-                    };
+                    $redis->publish($channel_id,json_encode($response));
                     break;
             };    
         } else {            

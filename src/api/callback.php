@@ -3,10 +3,10 @@ $redis = new \Redis;
 $redis->connect('redis', 6379);
 
 $tq_url = 'http://app:8000';
-$taskgroup = $_REQUEST['action'];
-
 $tq_ch = curl_init();
 curl_setopt($tq_ch, CURLOPT_URL,$tq_url);
+
+$taskgroup = $_REQUEST['action'];
 
 switch($taskgroup) {
     case 'login':

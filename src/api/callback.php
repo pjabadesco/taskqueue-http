@@ -5,8 +5,8 @@ $redis->connect('redis', 6379);
 $tq_url = 'http://app:8000';
 $taskgroup = $_REQUEST['action'];
 
-$ch = curl_init();
-curl_setopt($ch, CURLOPT_URL,$tq_url);
+$tq_ch = curl_init();
+curl_setopt($tq_ch, CURLOPT_URL,$tq_url);
 
 switch($taskgroup) {
     case 'login':
@@ -66,18 +66,20 @@ switch($taskgroup) {
         echo json_encode($data);    
 }
 
+curl_close($tq_ch);
+
 function tq_post($data) {
-    global $ch;
-    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+    global $tq_ch;
+    curl_setopt($tq_ch, CURLOPT_HTTPHEADER, array(
         'Content-Type: application/json'
     ));
-    curl_setopt($ch, CURLOPT_POST, 1);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
-    curl_setopt($ch, CURLOPT_TCP_FASTOPEN, 1);
-    $ret = curl_exec($ch);
-    curl_close ($ch);
+    curl_setopt($tq_ch, CURLOPT_POST, 1);
+    curl_setopt($tq_ch, CURLOPT_POSTFIELDS, json_encode($data));
+    curl_setopt($tq_ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($tq_ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+    curl_setopt($tq_ch, CURLOPT_TCP_FASTOPEN, 1);
+    $ret = curl_exec($tq_ch);
+    // curl_close ($tq_ch);
     $ret = json_decode($ret, true);  
     error_log('################# TQ_POST BEGIN #################');        
     error_log(print_r($ret, TRUE));         
@@ -89,7 +91,6 @@ function tq_log($taskgroup,$data,$success,$step=1,$completed=1){
     global $tq_url;
     $response = $data->response->body;
     $request = $data->request;
-
     tq_post(array(
         "taskname" => 'tq_log',
         "url" => 'http://api/api.php?action=tq_log',
@@ -109,7 +110,6 @@ function tq_log($taskgroup,$data,$success,$step=1,$completed=1){
             'data' => $data
         )
     ));
-
-    return $ret;
+    return;
 };
 ?>

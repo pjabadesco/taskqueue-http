@@ -91,18 +91,17 @@ switch($_REQUEST['action']) {
                     `success` tinyint(1) NULL DEFAULT 0,
                     `step` int(11) NULL,
                     `completed` tinyint(1) NULL DEFAULT 0,
-                    `url` varchar(255) NULL,
                     `data` json NULL,
-                    PRIMARY KEY (`id`)   ,
+                    PRIMARY KEY (`id`),
                     UNIQUE INDEX `channel_id`(`taskgroup`, `channel_id`)    
                 );
             ";
             $dbh->prepare($sql)->execute();
 
             $dbh->prepare("
-                INSERT INTO taskgroups (transdate, taskgroup, channel_id, task_id, taskname, success, step, completed, url, data) 
-                VALUES (NOW(), :taskgroup, :channel_id, :task_id, :taskname, :success, :step, :completed, :url, :data)
-                ON DUPLICATE KEY UPDATE transdate = NOW(), taskgroup = :taskgroup, channel_id = :channel_id, task_id = :task_id, taskname = :taskname, success = :success, step = :step, completed = :completed, url = :url, data = :data;
+                INSERT INTO taskgroups (transdate, taskgroup, channel_id, task_id, taskname, success, step, completed, data) 
+                VALUES (NOW(), :taskgroup, :channel_id, :task_id, :taskname, :success, :step, :completed, :data)
+                ON DUPLICATE KEY UPDATE transdate = NOW(), taskgroup = :taskgroup, channel_id = :channel_id, task_id = :task_id, taskname = :taskname, success = :success, step = :step, completed = :completed, data = :data;
             ")->execute(array(
                 ':taskgroup' => $data->taskgroup,
                 ':channel_id' => $data->channel,
@@ -111,7 +110,6 @@ switch($_REQUEST['action']) {
                 ':success' => $data->success,
                 ':step' => $data->step,
                 ':completed' => $data->completed,
-                ':url' => $data->url,
                 ':data' => json_encode($data->data)
             ));
 

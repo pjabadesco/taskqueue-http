@@ -78,16 +78,31 @@ class CallbackTask(celery.Task):
 @celery.task(name="create_task", base=CallbackTask, bind=True, autoretry_for=(RequestException,), retry_backoff=True)
 def create_task(self, taskname, url, http_method, body, headers, callback_url):
     # try:
-        headers.update({'X-TASK-ID': self.request.id})
+        headers.update({'X-TASK-ID': self.request.id})          
 
         if http_method == "GET":
             response = requests.get(url, headers=headers, allow_redirects=True)
         elif http_method == "POST":
-            response = requests.post(url, json=body, headers=headers, allow_redirects=True)
+            if headers.get('Content-Type') == 'application/json':            
+                response = requests.post(url, json=body, headers=headers, allow_redirects=True)
+            elif headers.get('Content-Type') == 'application/x-www-form-urlencoded':
+                response = requests.post(url, params=body, headers=headers, allow_redirects=True)
+            else:
+                response = requests.post(url, data=json.dumps(body), headers=headers, allow_redirects=True)
         elif http_method == "PUT":
-            response = requests.put(url, json=body, headers=headers, allow_redirects=True)
+            if headers.get('Content-Type') == 'application/json':            
+                response = requests.put(url, json=body, headers=headers, allow_redirects=True)
+            elif headers.get('Content-Type') == 'application/x-www-form-urlencoded':
+                response = requests.put(url, params=body, headers=headers, allow_redirects=True)
+            else:
+                response = requests.put(url, data=json.dumps(body), headers=headers, allow_redirects=True)
         elif http_method == "PATCH":
-            response = requests.patch(url, json=body, headers=headers, allow_redirects=True)
+            if headers.get('Content-Type') == 'application/json':            
+                response = requests.patch(url, json=body, headers=headers, allow_redirects=True)
+            elif headers.get('Content-Type') == 'application/x-www-form-urlencoded':
+                response = requests.patch(url, params=body, headers=headers, allow_redirects=True)
+            else:
+                response = requests.patch(url, data=json.dumps(body), headers=headers, allow_redirects=True)
         elif http_method == "DELETE":
             response = requests.delete(url, headers=headers, allow_redirects=True)
         else:
@@ -107,13 +122,13 @@ def create_task(self, taskname, url, http_method, body, headers, callback_url):
             response_body = response.text
 
         return {
-            # "url": url, 
-            # "http_method": http_method, 
-            "headers": headers, 
+            "url": url, 
+            "http_method": http_method, 
+            "headers": headers,
             # "body": body, 
             "status_code": response.status_code, 
             # "response_headers": response_headers, 
-            "body": response_body
+            "response": response_body
         }
         # return response.json()
         # return str(response)

@@ -31,7 +31,7 @@ io.on("connection", (socket) => {
     });
 
     redis.on("message", (channel, message) => {
-        // console.log(`\n############\nRECEIVED ${message} FROM ${channel}\n############\n`);
+        console.log(`\n############\nRECEIVED ${message} FROM ${channel}\n############\n`);
         socket.emit(channel, message);
     });  
     

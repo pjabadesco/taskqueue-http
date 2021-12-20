@@ -3,10 +3,8 @@ services:
 
   app:
     container_name: app
-    image: pjabadesco/taskqueue-http-app:latest
+    image: pjabadesco/taskqueue-http-app:0.5
     command: bash -c "uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
-    volumes:
-      - app:/app
     ports:
       - 8888:8000
     restart: always
@@ -17,14 +15,36 @@ services:
     restart: unless-stopped
     volumes:
       - redis:/data
+    ports:
+      - 6379:6379
     privileged: true
 
-  celery_worker:
-    container_name: celery_worker
-    image: pjabadesco/taskqueue-http-celery-worker:latest
+  celery_worker_01:
+    container_name: celery_worker_01
+    image: pjabadesco/taskqueue-http-celery-worker:0.5
     command: celery -A celery_worker.celery worker --loglevel=info
-    volumes:
-      - celery_worker:/app
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - app
+      - redis
+
+  celery_worker_02:
+    container_name: celery_worker_02
+    image: pjabadesco/taskqueue-http-celery-worker:0.5
+    command: celery -A celery_worker.celery worker --loglevel=info
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - app
+      - redis
+
+  celery_worker_03:
+    container_name: celery_worker_03
+    image: pjabadesco/taskqueue-http-celery-worker:0.5
+    command: celery -A celery_worker.celery worker --loglevel=info
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
@@ -34,7 +54,7 @@ services:
 
   flower:
     container_name: flower
-    image: pjabadesco/taskqueue-http-flower:latest
+    image: pjabadesco/taskqueue-http-flower:0.5
     command: celery -A celery_worker.celery flower --port=5555
     ports:
       - 5556:5555
@@ -44,9 +64,9 @@ services:
     depends_on:
       - app
       - redis
-      - celery_worker
+      - celery_worker_01
+      - celery_worker_02
+      - celery_worker_03
 
 volumes:
-  app: null
   redis: null
-  celery_worker: null

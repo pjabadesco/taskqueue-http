@@ -121,14 +121,19 @@ def create_task(self, taskname, url, http_method, body, headers, callback_url):
         except ValueError:
             response_body = response.text
 
+        response_headers = dict(response.headers)
+        # response_headers = response_headers + ({'X-TASK-ID': self.request.id},)
+        response_headers.update({'X-TASK-ID': self.request.id})   
+
         return {
-            "url": url, 
-            "http_method": http_method, 
-            "headers": headers,
+            # "url": url, 
+            # "http_method": http_method, 
+            "headers": response_headers,
+            # "headers": headers,
             # "body": body, 
             "status_code": response.status_code, 
             # "response_headers": response_headers, 
-            "response": response_body
+            "body": response_body
         }
         # return response.json()
         # return str(response)

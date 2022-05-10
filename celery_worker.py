@@ -86,21 +86,24 @@ def create_task(self, taskname, url, http_method, body, headers, callback_url):
             if headers.get('Content-Type') == 'application/json':            
                 response = requests.post(url, json=body, headers=headers, allow_redirects=True)
             elif headers.get('Content-Type') == 'application/x-www-form-urlencoded':
-                response = requests.post(url, params=body, headers=headers, allow_redirects=True)
+                # response = requests.post(url, params=body, headers=headers, allow_redirects=True)
+                response = requests.post(url, data=body, headers=headers, allow_redirects=True)
             else:
                 response = requests.post(url, data=json.dumps(body), headers=headers, allow_redirects=True)
         elif http_method == "PUT":
             if headers.get('Content-Type') == 'application/json':            
                 response = requests.put(url, json=body, headers=headers, allow_redirects=True)
             elif headers.get('Content-Type') == 'application/x-www-form-urlencoded':
-                response = requests.put(url, params=body, headers=headers, allow_redirects=True)
+                # response = requests.put(url, params=body, headers=headers, allow_redirects=True)
+                response = requests.put(url, data=body, headers=headers, allow_redirects=True)
             else:
                 response = requests.put(url, data=json.dumps(body), headers=headers, allow_redirects=True)
         elif http_method == "PATCH":
             if headers.get('Content-Type') == 'application/json':            
                 response = requests.patch(url, json=body, headers=headers, allow_redirects=True)
             elif headers.get('Content-Type') == 'application/x-www-form-urlencoded':
-                response = requests.patch(url, params=body, headers=headers, allow_redirects=True)
+                # response = requests.patch(url, params=body, headers=headers, allow_redirects=True)
+                response = requests.patch(url, data=body, headers=headers, allow_redirects=True)
             else:
                 response = requests.patch(url, data=json.dumps(body), headers=headers, allow_redirects=True)
         elif http_method == "DELETE":

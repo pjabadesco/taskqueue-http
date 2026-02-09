@@ -46,12 +46,13 @@ services:
   celery_worker_01:
     container_name: celery_worker_01
     build: .
-    command: celery -A celery_worker.celery worker --loglevel=info
+    command: celery -A celery_worker.celery worker --loglevel=info -Q default -n worker-txn-1@%h
     volumes:
       - .:/app
     environment:
       - CELERY_BROKER_URL=${CELERY_BROKER_URL}
       - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND}
+      - REQUEST_TIMEOUT=30
     depends_on:
       - app
       - redis
@@ -59,12 +60,13 @@ services:
   celery_worker_02:
     container_name: celery_worker_02
     build: .
-    command: celery -A celery_worker.celery worker --loglevel=info
+    command: celery -A celery_worker.celery worker --loglevel=info -Q default -n worker-txn-2@%h
     volumes:
       - .:/app
     environment:
       - CELERY_BROKER_URL=${CELERY_BROKER_URL}
       - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND}
+      - REQUEST_TIMEOUT=30
     depends_on:
       - app
       - redis
@@ -72,12 +74,13 @@ services:
   celery_worker_03:
     container_name: celery_worker_03
     build: .
-    command: celery -A celery_worker.celery worker --loglevel=info
+    command: celery -A celery_worker.celery worker --loglevel=info -Q default,campaigns -n worker-shared@%h
     volumes:
       - .:/app
     environment:
       - CELERY_BROKER_URL=${CELERY_BROKER_URL}
       - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND}
+      - REQUEST_TIMEOUT=30
     depends_on:
       - app
       - redis

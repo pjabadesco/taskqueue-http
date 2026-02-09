@@ -3,7 +3,7 @@ services:
 
   app:
     container_name: app
-    image: pjabadesco/taskqueue-http-app:0.8
+    image: pjabadesco/taskqueue-http-app:0.9
     command: bash -c "uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
     ports:
       - 8888:8000
@@ -21,43 +21,46 @@ services:
 
   celery_worker_01:
     container_name: celery_worker_01
-    image: pjabadesco/taskqueue-http-celery-worker:0.8
+    image: pjabadesco/taskqueue-http-celery-worker:0.9
     restart: unless-stopped
-    command: celery -A celery_worker.celery worker --loglevel=info
+    command: celery -A celery_worker.celery worker --loglevel=info -Q default -n worker-txn-1@%h
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - REQUEST_TIMEOUT=30
     depends_on:
       - app
       - redis
 
   celery_worker_02:
     container_name: celery_worker_02
-    image: pjabadesco/taskqueue-http-celery-worker:0.8
+    image: pjabadesco/taskqueue-http-celery-worker:0.9
     restart: unless-stopped
-    command: celery -A celery_worker.celery worker --loglevel=info
+    command: celery -A celery_worker.celery worker --loglevel=info -Q default -n worker-txn-2@%h
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - REQUEST_TIMEOUT=30
     depends_on:
       - app
       - redis
 
   celery_worker_03:
     container_name: celery_worker_03
-    image: pjabadesco/taskqueue-http-celery-worker:0.8
+    image: pjabadesco/taskqueue-http-celery-worker:0.9
     restart: unless-stopped
-    command: celery -A celery_worker.celery worker --loglevel=info
+    command: celery -A celery_worker.celery worker --loglevel=info -Q default,campaigns -n worker-shared@%h
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - REQUEST_TIMEOUT=30
     depends_on:
       - app
       - redis
 
   flower:
     container_name: flower
-    image: pjabadesco/taskqueue-http-flower:0.8
+    image: pjabadesco/taskqueue-http-flower:0.9
     restart: unless-stopped
     command: celery -A celery_worker.celery flower --port=5555
     ports:

@@ -7,6 +7,8 @@ from pprint import pprint
 
 from celery_worker import create_task
 
+# Allowed queue names — prevents arbitrary queue creation
+ALLOWED_QUEUES = {"default", "campaigns"}
 
 app = FastAPI()
 app.add_middleware(
@@ -30,6 +32,7 @@ def index_post(data=Body(...)):
     expires = data.get("expires", 86400)
     taskname = data.get("taskname", "celery_worker_queue")
     callback_url = data.get("callback_url", "")
+    queue = data.get("queue", None)  # v0.9: optional named queue routing
 
     if len(url) == 0:
         return JSONResponse({"message": "URL is required"}, status_code=500)
@@ -62,25 +65,30 @@ def index_post(data=Body(...)):
     if expires < 0:
         return JSONResponse({"message": "Dispatch deadline must be a positive integer"}, status_code=500)
 
+    # v0.9: Validate queue name against whitelist
+    if queue is not None:
+        queue = str(queue).strip().lower()
+        if queue == "":
+            queue = None
+        elif queue not in ALLOWED_QUEUES:
+            return JSONResponse(
+                {"message": f"Invalid queue name '{queue}'. Allowed: {', '.join(sorted(ALLOWED_QUEUES))}"},
+                status_code=400
+            )
+
     try:
         # create task
-        task = create_task.apply_async(
-            shadow=taskname,
-            args=(taskname, url, http_method, body, headers, callback_url),
-            # max_retries=5,
-            # expires=expires
-        )
-        # task = create_task.delay(url, http_method, body, headers)
+        task_kwargs = {
+            "shadow": taskname,
+            "args": (taskname, url, http_method, body, headers, callback_url),
+            "expires": expires,  # v0.9: enable task expiry (was commented out)
+        }
+        if queue:
+            task_kwargs["queue"] = queue  # v0.9: route to named queue
+        task = create_task.apply_async(**task_kwargs)
     except Exception as e:
         return JSONResponse({"message": str(e)}, status_code=500)
 
     return JSONResponse(
         {"message": "Task created successfully", "task_id": task.id}
     )
-
-    # task = create_task.delay(http_method, url, body, headers, expires)
-    # # return JSONResponse({"Result": task.get()})
-    # return JSONResponse({"Result": task.ready()})
-
-# if __name__ == "__main__":
-#     uvicorn.run(app)

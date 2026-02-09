@@ -34,9 +34,15 @@ docker-compose up
         "login": "admin",
         "password": "admin"
     },
-    "callback_url": "http://api/callback.php?action=login"
+    "callback_url": "http://api/callback.php?action=login",
+    "queue": "campaigns",
+    "expires": 86400
 }
 ```
+
+> **`queue`** (optional): Route the task to a named queue. Allowed values: `"default"`, `"campaigns"`. Omit or set to `null` to use the default queue.
+>
+> **`expires`** (optional): Task expiry in seconds. Tasks not picked up within this window are discarded. Default: `86400` (24 hours).
 
 ## RESPONSE:
 ```json

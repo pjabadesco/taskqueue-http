@@ -1,265 +1,322 @@
+---
 apiVersion: v1
-items:
-  - apiVersion: v1
-    kind: Service
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yml -o ../k8s/kompose.yaml
+    kompose.version: 1.38.0 (HEAD)
+  labels:
+    io.kompose.service: app
+  name: app
+spec:
+  ports:
+    - name: "8888"
+      port: 8888
+      targetPort: 8000
+  selector:
+    io.kompose.service: app
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yml -o ../k8s/kompose.yaml
+    kompose.version: 1.38.0 (HEAD)
+  labels:
+    io.kompose.service: flower
+  name: flower
+spec:
+  ports:
+    - name: "5556"
+      port: 5556
+      targetPort: 5555
+  selector:
+    io.kompose.service: flower
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yml -o ../k8s/kompose.yaml
+    kompose.version: 1.38.0 (HEAD)
+  labels:
+    io.kompose.service: redis
+  name: redis
+spec:
+  ports:
+    - name: "6379"
+      port: 6379
+      targetPort: 6379
+  selector:
+    io.kompose.service: redis
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yml -o ../k8s/kompose.yaml
+    kompose.version: 1.38.0 (HEAD)
+  labels:
+    io.kompose.service: app
+  name: app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: app
+  template:
     metadata:
       annotations:
-        kompose.cmd: kompose convert -f docker-compose.yml -o kompose.yaml
-        kompose.version: 1.23.0 (HEAD)
-      creationTimestamp: null
+        kompose.cmd: kompose convert -f docker-compose.yml -o ../k8s/kompose.yaml
+        kompose.version: 1.38.0 (HEAD)
       labels:
         io.kompose.service: app
-      name: app
     spec:
-      ports:
-        - name: "8888"
-          port: 8888
-          targetPort: 8000
-      selector:
-        io.kompose.service: app
-    status:
-      loadBalancer: {}
-  - apiVersion: v1
-    kind: Service
+      containers:
+        - args:
+            - bash
+            - -c
+            - uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+          image: pjabadesco/taskqueue-http-app:0.9
+          name: app
+          ports:
+            - containerPort: 8000
+              protocol: TCP
+      restartPolicy: Always
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yml -o ../k8s/kompose.yaml
+    kompose.version: 1.38.0 (HEAD)
+  labels:
+    io.kompose.service: celery-worker-01
+  name: celery-worker-01
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: celery-worker-01
+  template:
     metadata:
       annotations:
-        kompose.cmd: kompose convert -f docker-compose.yml -o kompose.yaml
-        kompose.version: 1.23.0 (HEAD)
-      creationTimestamp: null
+        kompose.cmd: kompose convert -f docker-compose.yml -o ../k8s/kompose.yaml
+        kompose.version: 1.38.0 (HEAD)
+      labels:
+        io.kompose.service: celery-worker-01
+    spec:
+      containers:
+        - args:
+            - celery
+            - -A
+            - celery_worker.celery
+            - worker
+            - --loglevel=info
+            - -Q
+            - default
+            - -n
+            - worker-txn-1@%h
+          env:
+            - name: CELERY_BROKER_URL
+              value: redis://redis:6379/0
+            - name: CELERY_RESULT_BACKEND
+              value: redis://redis:6379/0
+            - name: REQUEST_TIMEOUT
+              value: "30"
+          image: pjabadesco/taskqueue-http-celery-worker:0.9
+          name: celery-worker-01
+      restartPolicy: Always
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yml -o ../k8s/kompose.yaml
+    kompose.version: 1.38.0 (HEAD)
+  labels:
+    io.kompose.service: celery-worker-02
+  name: celery-worker-02
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: celery-worker-02
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.yml -o ../k8s/kompose.yaml
+        kompose.version: 1.38.0 (HEAD)
+      labels:
+        io.kompose.service: celery-worker-02
+    spec:
+      containers:
+        - args:
+            - celery
+            - -A
+            - celery_worker.celery
+            - worker
+            - --loglevel=info
+            - -Q
+            - default
+            - -n
+            - worker-txn-2@%h
+          env:
+            - name: CELERY_BROKER_URL
+              value: redis://redis:6379/0
+            - name: CELERY_RESULT_BACKEND
+              value: redis://redis:6379/0
+            - name: REQUEST_TIMEOUT
+              value: "30"
+          image: pjabadesco/taskqueue-http-celery-worker:0.9
+          name: celery-worker-02
+      restartPolicy: Always
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yml -o ../k8s/kompose.yaml
+    kompose.version: 1.38.0 (HEAD)
+  labels:
+    io.kompose.service: celery-worker-03
+  name: celery-worker-03
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: celery-worker-03
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.yml -o ../k8s/kompose.yaml
+        kompose.version: 1.38.0 (HEAD)
+      labels:
+        io.kompose.service: celery-worker-03
+    spec:
+      containers:
+        - args:
+            - celery
+            - -A
+            - celery_worker.celery
+            - worker
+            - --loglevel=info
+            - -Q
+            - default,campaigns
+            - -n
+            - worker-shared@%h
+          env:
+            - name: CELERY_BROKER_URL
+              value: redis://redis:6379/0
+            - name: CELERY_RESULT_BACKEND
+              value: redis://redis:6379/0
+            - name: REQUEST_TIMEOUT
+              value: "30"
+          image: pjabadesco/taskqueue-http-celery-worker:0.9
+          name: celery-worker-03
+      restartPolicy: Always
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yml -o ../k8s/kompose.yaml
+    kompose.version: 1.38.0 (HEAD)
+  labels:
+    io.kompose.service: flower
+  name: flower
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: flower
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.yml -o ../k8s/kompose.yaml
+        kompose.version: 1.38.0 (HEAD)
       labels:
         io.kompose.service: flower
-      name: flower
     spec:
-      ports:
-        - name: "5556"
-          port: 5556
-          targetPort: 5555
-      selector:
-        io.kompose.service: flower
-    status:
-      loadBalancer: {}
-  - apiVersion: apps/v1
-    kind: Deployment
+      containers:
+        - args:
+            - celery
+            - -A
+            - celery_worker.celery
+            - flower
+            - --port=5555
+          env:
+            - name: CELERY_BROKER_URL
+              value: redis://redis:6379/0
+            - name: CELERY_RESULT_BACKEND
+              value: redis://redis:6379/0
+          image: pjabadesco/taskqueue-http-flower:0.9
+          name: flower
+          ports:
+            - containerPort: 5555
+              protocol: TCP
+      restartPolicy: Always
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yml -o ../k8s/kompose.yaml
+    kompose.version: 1.38.0 (HEAD)
+  labels:
+    io.kompose.service: redis
+  name: redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: redis
+  strategy:
+    type: Recreate
+  template:
     metadata:
       annotations:
-        kompose.cmd: kompose convert -f docker-compose.yml -o kompose.yaml
-        kompose.version: 1.23.0 (HEAD)
-      creationTimestamp: null
-      labels:
-        io.kompose.service: app
-      name: app
-    spec:
-      replicas: 1
-      selector:
-        matchLabels:
-          io.kompose.service: app
-      strategy:
-        type: Recreate
-      template:
-        metadata:
-          annotations:
-            kompose.cmd: kompose convert -f docker-compose.yml -o kompose.yaml
-            kompose.version: 1.23.0 (HEAD)
-          creationTimestamp: null
-          labels:
-            io.kompose.service: app
-        spec:
-          containers:
-            - args:
-                - bash
-                - -c
-                - uvicorn main:app --host 0.0.0.0 --port 8000 --reload
-              image: pjabadesco/taskqueue-http-app:latest
-              name: app
-              ports:
-                - containerPort: 8000
-              resources: {}
-              volumeMounts:
-                - mountPath: /app
-                  name: app
-          restartPolicy: Always
-          volumes:
-            - name: app
-              persistentVolumeClaim:
-                claimName: app
-    status: {}
-  - apiVersion: v1
-    kind: PersistentVolumeClaim
-    metadata:
-      creationTimestamp: null
-      labels:
-        io.kompose.service: app
-      name: app
-    spec:
-      accessModes:
-        - ReadWriteOnce
-      resources:
-        requests:
-          storage: 100Mi
-    status: {}
-  - apiVersion: apps/v1
-    kind: Deployment
-    metadata:
-      annotations:
-        kompose.cmd: kompose convert -f docker-compose.yml -o kompose.yaml
-        kompose.version: 1.23.0 (HEAD)
-      creationTimestamp: null
-      labels:
-        io.kompose.service: celery-worker
-      name: celery-worker
-    spec:
-      replicas: 1
-      selector:
-        matchLabels:
-          io.kompose.service: celery-worker
-      strategy:
-        type: Recreate
-      template:
-        metadata:
-          annotations:
-            kompose.cmd: kompose convert -f docker-compose.yml -o kompose.yaml
-            kompose.version: 1.23.0 (HEAD)
-          creationTimestamp: null
-          labels:
-            io.kompose.service: celery-worker
-        spec:
-          containers:
-            - args:
-                - celery
-                - -A
-                - celery_worker.celery
-                - worker
-                - --loglevel=info
-              env:
-                - name: CELERY_BROKER_URL
-                  value: redis://redis:6379/0
-                - name: CELERY_RESULT_BACKEND
-                  value: redis://redis:6379/0
-              image: pjabadesco/taskqueue-http-celery-worker:latest
-              name: celery-worker
-              resources: {}
-              volumeMounts:
-                - mountPath: /app
-                  name: celery-worker
-          restartPolicy: Always
-          volumes:
-            - name: celery-worker
-              persistentVolumeClaim:
-                claimName: celery-worker
-    status: {}
-  - apiVersion: v1
-    kind: PersistentVolumeClaim
-    metadata:
-      creationTimestamp: null
-      labels:
-        io.kompose.service: celery-worker
-      name: celery-worker
-    spec:
-      accessModes:
-        - ReadWriteOnce
-      resources:
-        requests:
-          storage: 100Mi
-    status: {}
-  - apiVersion: apps/v1
-    kind: Deployment
-    metadata:
-      annotations:
-        kompose.cmd: kompose convert -f docker-compose.yml -o kompose.yaml
-        kompose.version: 1.23.0 (HEAD)
-      creationTimestamp: null
-      labels:
-        io.kompose.service: flower
-      name: flower
-    spec:
-      replicas: 1
-      selector:
-        matchLabels:
-          io.kompose.service: flower
-      strategy: {}
-      template:
-        metadata:
-          annotations:
-            kompose.cmd: kompose convert -f docker-compose.yml -o kompose.yaml
-            kompose.version: 1.23.0 (HEAD)
-          creationTimestamp: null
-          labels:
-            io.kompose.service: flower
-        spec:
-          containers:
-            - args:
-                - celery
-                - -A
-                - celery_worker.celery
-                - flower
-                - --port=5555
-              env:
-                - name: CELERY_BROKER_URL
-                  value: redis://redis:6379/0
-                - name: CELERY_RESULT_BACKEND
-                  value: redis://redis:6379/0
-              image: pjabadesco/taskqueue-http-flower:latest
-              name: flower
-              ports:
-                - containerPort: 5555
-              resources: {}
-          restartPolicy: Always
-    status: {}
-  - apiVersion: apps/v1
-    kind: Deployment
-    metadata:
-      annotations:
-        kompose.cmd: kompose convert -f docker-compose.yml -o kompose.yaml
-        kompose.version: 1.23.0 (HEAD)
-      creationTimestamp: null
+        kompose.cmd: kompose convert -f docker-compose.yml -o ../k8s/kompose.yaml
+        kompose.version: 1.38.0 (HEAD)
       labels:
         io.kompose.service: redis
-      name: redis
     spec:
-      replicas: 1
-      selector:
-        matchLabels:
-          io.kompose.service: redis
-      strategy:
-        type: Recreate
-      template:
-        metadata:
-          annotations:
-            kompose.cmd: kompose convert -f docker-compose.yml -o kompose.yaml
-            kompose.version: 1.23.0 (HEAD)
-          creationTimestamp: null
-          labels:
-            io.kompose.service: redis
-        spec:
-          containers:
-            - image: redis:6.2-alpine
+      containers:
+        - image: redis:6.2-alpine
+          name: redis
+          ports:
+            - containerPort: 6379
+              protocol: TCP
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - mountPath: /data
               name: redis
-              resources: {}
-              securityContext:
-                privileged: true
-              volumeMounts:
-                - mountPath: /data
-                  name: redis
-          restartPolicy: Always
-          volumes:
-            - name: redis
-              persistentVolumeClaim:
-                claimName: redis
-    status: {}
-  - apiVersion: v1
-    kind: PersistentVolumeClaim
-    metadata:
-      creationTimestamp: null
-      labels:
-        io.kompose.service: redis
-      name: redis
-    spec:
-      accessModes:
-        - ReadWriteOnce
-      resources:
-        requests:
-          storage: 100Mi
-    status: {}
-kind: List
-metadata: {}
+      restartPolicy: Always
+      volumes:
+        - name: redis
+          persistentVolumeClaim:
+            claimName: redis
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    io.kompose.service: redis
+  name: redis
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
 

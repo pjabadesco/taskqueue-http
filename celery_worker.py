@@ -125,11 +125,21 @@ def create_task(self, taskname, url, http_method, body, headers, callback_url):
         )
 
     # v0.9: Distinguish 4xx (client error) vs 5xx (server error)
+    # v0.9.1: Handle 429 (rate limit) as retryable with Retry-After support
     if response.status_code >= 500:
         raise self.retry(
             exc=RequestException(f'{url} returned server error: {response.status_code}'),
             countdown=min(2 ** self.request.retries * 5, 300),
             max_retries=5,
+            expires=None
+        )
+    elif response.status_code == 429:
+        retry_after = int(response.headers.get('Retry-After', 0))
+        countdown = max(retry_after, min(2 ** self.request.retries * 5, 300))
+        raise self.retry(
+            exc=RequestException(f'{url} returned rate limit: 429'),
+            countdown=countdown,
+            max_retries=10,
             expires=None
         )
     elif response.status_code >= 400:
